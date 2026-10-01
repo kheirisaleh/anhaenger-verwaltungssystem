@@ -178,7 +178,7 @@ Hoehe 22, horizontales Padding `AppSpacing.sm`, Radius `AppRadius.sm`, Text `App
 Vertragsstatus: Aktiv (`statusRented`), Abgeschlossen (`statusAvailable`), Storniert (`statusBlocked`).
 
 ### Navigation
-`NavigationView` mit linker `NavigationPane`, Modus `open`, Breite 260.
+`NavigationView` mit linker `NavigationPane`, Modus `expanded`, Breite 260.
 Reihenfolge fest: Dashboard, Anhaenger, Schaeden, Kunden, Vertraege, Einstellungen.
 Einstellungen immer im Fussbereich der Pane.
 

@@ -16,5 +16,5 @@ build/
 *.log
 *.sqlite
 *.sqlite-journal
-data/
-backup/
+/data/
+/backup/

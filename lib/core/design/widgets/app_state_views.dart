@@ -93,7 +93,7 @@ class AppErrorState extends StatelessWidget {
             color: AppColors.danger,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(AppStrings.errorGeneric, style: AppText.cardTitle),
+          const Text(AppStrings.errorGeneric, style: AppText.cardTitle),
           const SizedBox(height: AppSpacing.xs),
           Text(message, style: AppText.bodyMuted),
           if (onRetry != null) ...<Widget>[
