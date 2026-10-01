@@ -7,16 +7,13 @@ import '../app_typography.dart';
 
 class AppStatusBadge extends StatelessWidget {
   const AppStatusBadge.trailer(TrailerStatus status, {super.key})
-      : _label = null,
-        _trailerStatus = status,
+      : _trailerStatus = status,
         _contractStatus = null;
 
   const AppStatusBadge.contract(ContractStatus status, {super.key})
-      : _label = null,
-        _trailerStatus = null,
+      : _trailerStatus = null,
         _contractStatus = status;
 
-  final String? _label;
   final TrailerStatus? _trailerStatus;
   final ContractStatus? _contractStatus;
 
@@ -37,24 +34,26 @@ class AppStatusBadge extends StatelessWidget {
     );
   }
 
-  String get _text =>
-      _label ?? _trailerStatus?.label ?? _contractStatus?.label ?? '';
+  String get _text => _trailerStatus?.label ?? _contractStatus?.label ?? '';
 
   Color get _color {
-    if (_trailerStatus != null) {
-      return switch (_trailerStatus) {
+    final TrailerStatus? trailerStatus = _trailerStatus;
+    if (trailerStatus != null) {
+      return switch (trailerStatus) {
         TrailerStatus.available => AppColors.statusAvailable,
         TrailerStatus.rented => AppColors.statusRented,
         TrailerStatus.maintenance => AppColors.statusMaintenance,
         TrailerStatus.blocked => AppColors.statusBlocked,
-        null => AppColors.statusBlocked,
       };
     }
-    return switch (_contractStatus) {
-      ContractStatus.active => AppColors.statusRented,
-      ContractStatus.completed => AppColors.statusAvailable,
-      ContractStatus.cancelled => AppColors.statusBlocked,
-      null => AppColors.statusBlocked,
-    };
+    final ContractStatus? contractStatus = _contractStatus;
+    if (contractStatus != null) {
+      return switch (contractStatus) {
+        ContractStatus.active => AppColors.statusRented,
+        ContractStatus.completed => AppColors.statusAvailable,
+        ContractStatus.cancelled => AppColors.statusBlocked,
+      };
+    }
+    return AppColors.statusBlocked;
   }
 }
