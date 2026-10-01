@@ -22,7 +22,7 @@ class _AppShellState extends State<AppShell> {
       pane: NavigationPane(
         selected: _selectedIndex,
         onChanged: (int index) => setState(() => _selectedIndex = index),
-        displayMode: PaneDisplayMode.open,
+        displayMode: PaneDisplayMode.expanded,
         size: const NavigationPaneSize(openWidth: AppSizes.navigationPaneWidth),
         items: <NavigationPaneItem>[
           _item(AppIcons.dashboard, AppStrings.navDashboard),
