@@ -1,0 +1,438 @@
+<title>Anhaenger Design System</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: fixed left index rail on wide screens, single stacked column under 900px */
+:root{
+  --ds-accent:#0F6CBD;
+  --ds-accent-hover:#115EA3;
+  --ds-bg:#F3F2F1;
+  --ds-surface:#FFFFFF;
+  --ds-border:#E1DFDD;
+  --ds-divider:#EDEBE9;
+  --ds-fg:#201F1E;
+  --ds-fg-muted:#605E5C;
+  --ds-fg-disabled:#A19F9D;
+  --ds-success:#107C10;
+  --ds-warning:#CA5010;
+  --ds-danger:#A4262C;
+  --ds-code-bg:#F7F6F5;
+  --ds-font:"IBM Plex Sans",Segoe UI,system-ui,sans-serif;
+  --ds-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ds-accent:#5CAAE5;
+    --ds-accent-hover:#7FBFEE;
+    --ds-bg:#1B1A19;
+    --ds-surface:#252423;
+    --ds-border:#3B3A39;
+    --ds-divider:#323130;
+    --ds-fg:#F3F2F1;
+    --ds-fg-muted:#B3B0AD;
+    --ds-fg-disabled:#7A7876;
+    --ds-success:#54B054;
+    --ds-warning:#E8884E;
+    --ds-danger:#E0737B;
+    --ds-code-bg:#1F1E1D;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ds-accent:#5CAAE5;
+  --ds-accent-hover:#7FBFEE;
+  --ds-bg:#1B1A19;
+  --ds-surface:#252423;
+  --ds-border:#3B3A39;
+  --ds-divider:#323130;
+  --ds-fg:#F3F2F1;
+  --ds-fg-muted:#B3B0AD;
+  --ds-fg-disabled:#7A7876;
+  --ds-success:#54B054;
+  --ds-warning:#E8884E;
+  --ds-danger:#E0737B;
+  --ds-code-bg:#1F1E1D;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ds-bg);color:var(--ds-fg);font-family:var(--ds-font);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 72px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:40px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}nav.rail{position:static!important}}
+nav.rail{position:sticky;top:env(safe-area-inset-top,0px);font-size:13px}
+nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+nav.rail a{display:block;padding:5px 9px;border-radius:4px;color:var(--ds-fg-muted);text-decoration:none;border-left:2px solid transparent}
+nav.rail a:hover{background:var(--ds-surface);color:var(--ds-fg);border-left-color:var(--ds-accent)}
+nav.rail .num{font-family:var(--ds-mono);font-size:11px;color:var(--ds-fg-disabled);margin-right:7px}
+header.top{grid-column:1/-1;border-bottom:2px solid var(--ds-fg);padding-bottom:18px;margin-bottom:4px}
+.eyebrow{font-family:var(--ds-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ds-fg-muted);margin:0 0 10px}
+h1{font-size:clamp(28px,4.2vw,40px);font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.lede{color:var(--ds-fg-muted);max-width:62ch;margin:10px 0 0}
+main{display:flex;flex-direction:column;gap:44px;min-width:0}
+section{scroll-margin-top:24px}
+h2{font-size:21px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+h2 .num{font-family:var(--ds-mono);font-size:12px;color:var(--ds-accent);margin-right:10px;font-weight:500}
+h3{font-size:15px;font-weight:600;margin:24px 0 8px}
+.hint{color:var(--ds-fg-muted);font-size:14px;margin:0 0 16px;max-width:64ch}
+.panel{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:8px;padding:18px}
+.rules{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:9px;counter-reset:r}
+.rules li{counter-increment:r;padding-left:30px;position:relative;font-size:14px}
+.rules li::before{content:counter(r,decimal-leading-zero);position:absolute;left:0;top:1px;font-family:var(--ds-mono);font-size:11px;color:var(--ds-accent)}
+code,.mono{font-family:var(--ds-mono);font-size:.88em;background:var(--ds-code-bg);border:1px solid var(--ds-divider);border-radius:3px;padding:1px 5px}
+pre{font-family:var(--ds-mono);font-size:12.5px;background:var(--ds-code-bg);border:1px solid var(--ds-border);border-radius:6px;padding:14px;overflow-x:auto;margin:0;line-height:1.6}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sw{border:1px solid var(--ds-border);border-radius:6px;overflow:hidden;background:var(--ds-surface)}
+.sw .chip{height:52px}
+.sw .meta{padding:7px 9px;font-family:var(--ds-mono);font-size:11px;line-height:1.5}
+.sw .meta b{display:block;font-weight:500;color:var(--ds-fg)}
+.sw .meta span{color:var(--ds-fg-muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tablewrap{overflow-x:auto;border:1px solid var(--ds-border);border-radius:8px;background:var(--ds-surface)}
+th{text-align:left;font-size:13px;font-weight:600;background:var(--ds-bg);padding:9px 14px;border-bottom:1px solid var(--ds-border);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid var(--ds-divider);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:8px;padding:16px;min-width:0}
+.card h4{margin:0 0 3px;font-size:15px;font-weight:600;font-family:var(--ds-mono)}
+.card p{margin:0 0 10px;font-size:13px;color:var(--ds-fg-muted)}
+.card dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13px}
+.card dt{color:var(--ds-fg-muted)}
+.card dd{margin:0}
+.demo{border:1px dashed var(--ds-border);border-radius:6px;padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--ds-bg);margin-bottom:12px}
+.btn{font-family:inherit;font-size:14px;height:32px;padding:0 16px;border-radius:4px;border:1px solid transparent;display:inline-flex;align-items:center;gap:8px;cursor:default;line-height:1}
+.btn-primary{background:var(--ds-accent);color:#fff}
+.btn-secondary{background:var(--ds-surface);color:var(--ds-fg);border-color:var(--ds-border)}
+.btn-danger{background:var(--ds-danger);color:#fff}
+.btn-subtle{background:transparent;color:var(--ds-accent)}
+.btn-disabled{background:var(--ds-surface);color:var(--ds-fg-disabled);border-color:var(--ds-divider)}
+.field{max-width:300px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.field input{width:100%;height:32px;padding:0 10px;font-family:inherit;font-size:14px;border:1px solid var(--ds-border);border-radius:4px;background:var(--ds-surface);color:var(--ds-fg)}
+.field input:focus{outline:none;border-color:var(--ds-accent);box-shadow:0 0 0 1px var(--ds-accent)}
+.field .err{font-size:12px;color:var(--ds-danger);margin-top:4px}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;font-size:12px;color:#fff;white-space:nowrap}
+.b-av{background:#107C10}.b-re{background:#0F6CBD}.b-ma{background:#CA5010}.b-bl{background:#605E5C}
+.states{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.state{border:1px solid var(--ds-border);border-radius:8px;background:var(--ds-surface);padding:26px 16px;text-align:center}
+.state .ico{width:44px;height:44px;margin:0 auto 12px;display:grid;place-items:center;border-radius:50%;background:var(--ds-bg);color:var(--ds-fg-disabled)}
+.state .ico.danger{color:var(--ds-danger)}
+.state strong{display:block;font-size:15px;margin-bottom:3px}
+.state span{font-size:13px;color:var(--ds-fg-muted)}
+.ring{width:26px;height:26px;border:3px solid var(--ds-divider);border-top-color:var(--ds-accent);border-radius:50%;animation:spin 1s linear infinite}
+@media (prefers-reduced-motion:reduce){.ring{animation:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scale{display:flex;flex-direction:column;gap:12px}
+.scale .row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--ds-divider)}
+.scale .row:last-child{border-bottom:0;padding-bottom:0}
+.scale .tag{font-family:var(--ds-mono);font-size:11px;color:var(--ds-fg-muted);min-width:110px}
+.spacebars{display:flex;flex-direction:column;gap:9px}
+.spacebars .r{display:flex;align-items:center;gap:12px;font-family:var(--ds-mono);font-size:12px}
+.spacebars .bar{height:14px;background:var(--ds-accent);border-radius:2px}
+.spacebars .lbl{min-width:132px;color:var(--ds-fg-muted)}
+.layout{font-family:var(--ds-mono);font-size:12.5px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--ds-fg-muted)}
+.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:14px}
+.check li{display:flex;gap:10px;align-items:flex-start}
+.check li::before{content:"";width:14px;height:14px;margin-top:4px;flex:0 0 auto;border:1.5px solid var(--ds-fg-disabled);border-radius:3px}
+footer{grid-column:1/-1;border-top:1px solid var(--ds-border);margin-top:16px;padding-top:16px;font-size:13px;color:var(--ds-fg-muted)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Anhaenger-Verwaltungssystem · Flutter + fluent_ui</p>
+    <h1>Design System</h1>
+    <p class="lede">Verbindliche visuelle und strukturelle Vorgaben. Diese Seite zusammen mit jeder Aufgabe an die KI geben. Es duerfen keine eigenen Farben, Abstaende, Komponenten oder Texte erfunden werden.</p>
+  </header>
+
+  <nav class="rail">
+    <ol>
+      <li><a href="#regeln"><span class="num">00</span>Regeln</a></li>
+      <li><a href="#farben"><span class="num">01</span>Farben</a></li>
+      <li><a href="#typografie"><span class="num">02</span>Typografie</a></li>
+      <li><a href="#abstaende"><span class="num">03</span>Abstaende</a></li>
+      <li><a href="#icons"><span class="num">04</span>Icons</a></li>
+      <li><a href="#komponenten"><span class="num">05</span>Komponenten</a></li>
+      <li><a href="#formulare"><span class="num">06</span>Formulare</a></li>
+      <li><a href="#seitenaufbau"><span class="num">07</span>Seitenaufbau</a></li>
+      <li><a href="#zustaende"><span class="num">08</span>Zustaende</a></li>
+      <li><a href="#texte"><span class="num">09</span>Standardtexte</a></li>
+      <li><a href="#checkliste"><span class="num">10</span>Checkliste</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="regeln">
+      <h2><span class="num">00</span>Regeln</h2>
+      <p class="hint">Diese acht Punkte gelten ohne Ausnahme und sind im Code Review pruefbar.</p>
+      <div class="panel">
+        <ol class="rules">
+          <li>Keine rohen Farben (<code>Color(0x...)</code>, <code>Colors.*</code>) ausserhalb der Datei <code>app_colors.dart</code>. Immer <code>AppColors</code>.</li>
+          <li>Keine rohen Zahlen fuer Abstaende oder Radien. Immer <code>AppSpacing</code> oder <code>AppRadius</code>.</li>
+          <li>Keine rohen <code>TextStyle</code>. Immer <code>AppText</code>.</li>
+          <li>Nie <code>Button</code>, <code>TextBox</code> oder <code>ContentDialog</code> direkt im Feature-Code. Immer die <code>App*</code>-Komponenten.</li>
+          <li>Jede Seite folgt dem Aufbau aus Abschnitt 07.</li>
+          <li>Alle Oberflaechentexte sind Deutsch. Fehler-, Lade- und Leer-Texte stehen in Abschnitt 09.</li>
+          <li>Keine neuen Dependencies. Nur <code>fluent_ui</code>.</li>
+          <li>Keine Kommentare und keine Emojis im Code. Variablennamen Englisch.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="farben">
+      <h2><span class="num">01</span>Farben</h2>
+      <p class="hint">Alle Werte liegen in <code>lib/core/design/app_colors.dart</code>. Statusfarben kommen direkt aus dem Datenmodell und werden nie manuell gesetzt.</p>
+      <h3>Basis</h3>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:#0F6CBD"></div><div class="meta"><b>accent</b><span>0xFF0F6CBD</span></div></div>
+        <div class="sw"><div class="chip" style="background:#115EA3"></div><div class="meta"><b>accentHover</b><span>0xFF115EA3</span></div></div>
+        <div class="sw"><div class="chip" style="background:#F3F2F1"></div><div class="meta"><b>background</b><span>0xFFF3F2F1</span></div></div>
+        <div class="sw"><div class="chip" style="background:#FFFFFF;border-bottom:1px solid #E1DFDD"></div><div class="meta"><b>surface</b><span>0xFFFFFFFF</span></div></div>
+        <div class="sw"><div class="chip" style="background:#E1DFDD"></div><div class="meta"><b>border</b><span>0xFFE1DFDD</span></div></div>
+        <div class="sw"><div class="chip" style="background:#EDEBE9"></div><div class="meta"><b>divider</b><span>0xFFEDEBE9</span></div></div>
+      </div>
+      <h3>Text</h3>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:#201F1E"></div><div class="meta"><b>textPrimary</b><span>0xFF201F1E</span></div></div>
+        <div class="sw"><div class="chip" style="background:#605E5C"></div><div class="meta"><b>textSecondary</b><span>0xFF605E5C</span></div></div>
+        <div class="sw"><div class="chip" style="background:#A19F9D"></div><div class="meta"><b>textDisabled</b><span>0xFFA19F9D</span></div></div>
+      </div>
+      <h3>Semantik und Status</h3>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:#107C10"></div><div class="meta"><b>success / statusAvailable</b><span>0xFF107C10</span></div></div>
+        <div class="sw"><div class="chip" style="background:#0F6CBD"></div><div class="meta"><b>statusRented</b><span>0xFF0F6CBD</span></div></div>
+        <div class="sw"><div class="chip" style="background:#CA5010"></div><div class="meta"><b>warning / statusMaintenance</b><span>0xFFCA5010</span></div></div>
+        <div class="sw"><div class="chip" style="background:#A4262C"></div><div class="meta"><b>danger</b><span>0xFFA4262C</span></div></div>
+        <div class="sw"><div class="chip" style="background:#605E5C"></div><div class="meta"><b>statusBlocked</b><span>0xFF605E5C</span></div></div>
+      </div>
+      <p class="hint" style="margin-top:14px">Nur Hellmodus. Kein Darkmode in diesem Projekt.</p>
+    </section>
+
+    <section id="typografie">
+      <h2><span class="num">02</span>Typografie</h2>
+      <p class="hint">Schriftart Segoe UI, der Windows-Systemstandard. Pro Seite genau ein <code>pageTitle</code>.</p>
+      <div class="panel scale">
+        <div class="row"><span class="tag">pageTitle · 28 · w600</span><span style="font-size:28px;font-weight:600">Anhaenger verwalten</span></div>
+        <div class="row"><span class="tag">sectionTitle · 20 · w600</span><span style="font-size:20px;font-weight:600">Schadenshistorie</span></div>
+        <div class="row"><span class="tag">cardTitle · 16 · w600</span><span style="font-size:16px;font-weight:600">Fuhrpark-Status</span></div>
+        <div class="row"><span class="tag">body · 14</span><span style="font-size:14px">Tieflader, Kennzeichen F-AB 1234</span></div>
+        <div class="row"><span class="tag">bodyMuted · 14</span><span style="font-size:14px;color:var(--ds-fg-muted)">Zuletzt aktualisiert am 28.09.2026</span></div>
+        <div class="row"><span class="tag">label · 13 · w600</span><span style="font-size:13px;font-weight:600">Kennzeichen</span></div>
+        <div class="row"><span class="tag">caption · 12</span><span style="font-size:12px;color:var(--ds-fg-muted)">Optional, maximal 200 Zeichen</span></div>
+      </div>
+    </section>
+
+    <section id="abstaende">
+      <h2><span class="num">03</span>Abstaende und Radien</h2>
+      <div class="panel spacebars">
+        <div class="r"><span class="lbl">xs · 4</span><span class="bar" style="width:4px"></span></div>
+        <div class="r"><span class="lbl">sm · 8</span><span class="bar" style="width:8px"></span></div>
+        <div class="r"><span class="lbl">md · 16</span><span class="bar" style="width:16px"></span></div>
+        <div class="r"><span class="lbl">lg · 24</span><span class="bar" style="width:24px"></span></div>
+        <div class="r"><span class="lbl">xl · 32</span><span class="bar" style="width:32px"></span></div>
+      </div>
+      <h3>Feste Anwendung</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Stelle</th><th>Wert</th></tr>
+        <tr><td>Seitenrand</td><td><code>AppSpacing.lg</code></td></tr>
+        <tr><td>Abstand zwischen Sektionen</td><td><code>AppSpacing.lg</code></td></tr>
+        <tr><td>Abstand zwischen Formularfeldern</td><td><code>AppSpacing.md</code></td></tr>
+        <tr><td>Abstand Label zu Eingabefeld</td><td><code>AppSpacing.xs</code></td></tr>
+        <tr><td>Padding in Karten</td><td><code>AppSpacing.md</code></td></tr>
+        <tr><td>Abstand zwischen Buttons</td><td><code>AppSpacing.sm</code></td></tr>
+        <tr><td>Radius Buttons, Eingaben, Badges</td><td><code>AppRadius.sm</code> · 4</td></tr>
+        <tr><td>Radius Karten und Dialoge</td><td><code>AppRadius.md</code> · 8</td></tr>
+      </table></div>
+    </section>
+
+    <section id="icons">
+      <h2><span class="num">04</span>Icons</h2>
+      <p class="hint">Nur <code>FluentIcons</code>. Die Zuordnung ist fest, damit dieselbe Aktion ueberall gleich aussieht. Groesse 16 in Buttons und Tabellen, 20 in der Navigation, 48 in Leerzustaenden.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Aktion</th><th>Icon</th><th>Aktion</th><th>Icon</th></tr>
+        <tr><td>Hinzufuegen</td><td><code>add</code></td><td>Dashboard</td><td><code>view_dashboard</code></td></tr>
+        <tr><td>Bearbeiten</td><td><code>edit</code></td><td>Anhaenger</td><td><code>car</code></td></tr>
+        <tr><td>Loeschen</td><td><code>delete</code></td><td>Schaeden</td><td><code>warning</code></td></tr>
+        <tr><td>Speichern</td><td><code>save</code></td><td>Kunden</td><td><code>people</code></td></tr>
+        <tr><td>Suchen</td><td><code>search</code></td><td>Vertraege</td><td><code>document</code></td></tr>
+        <tr><td>Filter</td><td><code>filter</code></td><td>Einstellungen</td><td><code>settings</code></td></tr>
+        <tr><td>Zurueck</td><td><code>back</code></td><td>Export</td><td><code>download</code></td></tr>
+        <tr><td>Foto</td><td><code>photo2</code></td><td>Standort</td><td><code>map_pin</code></td></tr>
+      </table></div>
+    </section>
+
+    <section id="komponenten">
+      <h2><span class="num">05</span>Komponenten</h2>
+      <p class="hint">Alle liegen in <code>lib/core/design/widgets/</code>. Die Darstellungen hier sind die verbindliche Zielwirkung.</p>
+
+      <h3>AppButton</h3>
+      <div class="demo">
+        <span class="btn btn-primary">Speichern</span>
+        <span class="btn btn-secondary">Abbrechen</span>
+        <span class="btn btn-danger">Loeschen</span>
+        <span class="btn btn-subtle">Details</span>
+        <span class="btn btn-disabled">Speichern</span>
+        <span class="btn btn-primary"><span class="ring" style="width:16px;height:16px;border-width:2px;border-top-color:#fff;border-color:rgba(255,255,255,.4) rgba(255,255,255,.4) rgba(255,255,255,.4) rgba(255,255,255,.4);border-top-color:#fff"></span>Speichern</span>
+      </div>
+      <div class="spec">
+        <div class="card">
+          <h4>AppButton</h4>
+          <p>Primaeraktion, Sekundaeraktion, Loeschen, dezente Inline-Aktion.</p>
+          <dl>
+            <dt>Varianten</dt><dd>primary, secondary, danger, subtle</dd>
+            <dt>Hoehe</dt><dd>32</dd>
+            <dt>Padding</dt><dd>horizontal <code>md</code></dd>
+            <dt>Radius</dt><dd><code>sm</code></dd>
+            <dt>Zustaende</dt><dd>normal, hover, pressed, disabled, loading</dd>
+            <dt>Regel</dt><dd>Pro Dialog oder Formular genau ein primary. danger nur fuer Loeschen.</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h4>AppCard</h4>
+          <p>Container fuer Kennzahlen, Detailbloecke und Kachelansichten.</p>
+          <dl>
+            <dt>Hintergrund</dt><dd><code>surface</code></dd>
+            <dt>Rahmen</dt><dd>1 px <code>border</code></dd>
+            <dt>Radius</dt><dd><code>md</code></dd>
+            <dt>Padding</dt><dd><code>md</code></dd>
+            <dt>Schatten</dt><dd>keiner</dd>
+            <dt>Titel</dt><dd><code>cardTitle</code>, darunter <code>sm</code></dd>
+          </dl>
+        </div>
+      </div>
+
+      <h3>AppTextField</h3>
+      <div class="demo" style="align-items:flex-start">
+        <div class="field">
+          <label for="demo-plate">Kennzeichen *</label>
+          <input id="demo-plate" value="F-AB 1234">
+        </div>
+        <div class="field">
+          <label for="demo-mail">E-Mail *</label>
+          <input id="demo-mail" value="kunde@beispiel" style="border-color:var(--ds-danger)">
+          <div class="err">Bitte geben Sie eine gueltige E-Mail-Adresse ein.</div>
+        </div>
+      </div>
+      <p class="hint">Label oberhalb in <code>AppText.label</code>, Abstand <code>xs</code>. Hoehe 32. Fokusrahmen in <code>accent</code>. Fehlertext darunter in <code>caption</code> mit <code>danger</code>. Pflichtfelder enden im Label mit einem Sternzeichen.</p>
+
+      <h3>AppStatusBadge</h3>
+      <div class="demo">
+        <span class="badge b-av">Verfuegbar</span>
+        <span class="badge b-re">Vermietet</span>
+        <span class="badge b-ma">In Wartung</span>
+        <span class="badge b-bl">Gesperrt</span>
+      </div>
+      <p class="hint">Hoehe 22, Padding horizontal <code>sm</code>, Radius <code>sm</code>, Text <code>caption</code> in Weiss. Vertragsstatus nutzt dieselbe Komponente: Aktiv blau, Abgeschlossen gruen, Storniert grau.</p>
+
+      <h3>AppDataTable</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Kennzeichen</th><th>Typ</th><th>Status</th><th>Standort</th><th class="num">Letzte Kosten</th><th class="num">Angelegt</th></tr>
+        <tr><td>F-AB 1234</td><td>Tieflader</td><td><span class="badge b-av">Verfuegbar</span></td><td>Hof Frankfurt</td><td class="num">320,00 Euro</td><td class="num">14.03.2026</td></tr>
+        <tr><td>F-CD 5678</td><td>Pkw-Anhaenger</td><td><span class="badge b-re">Vermietet</span></td><td>Offenbach, Hauptstr. 7</td><td class="num">0,00 Euro</td><td class="num">02.05.2026</td></tr>
+        <tr><td>F-EF 9012</td><td>Kipper</td><td><span class="badge b-ma">In Wartung</span></td><td>Werkstatt Nord</td><td class="num">1.240,50 Euro</td><td class="num">21.08.2026</td></tr>
+        <tr><td>F-GH 3456</td><td>Kofferanhaenger</td><td><span class="badge b-bl">Gesperrt</span></td><td>Hof Frankfurt</td><td class="num">85,00 Euro</td><td class="num">09.09.2026</td></tr>
+      </table></div>
+      <p class="hint">Kopfzeile 36 hoch in <code>label</code> auf <code>background</code>. Datenzeile 40 hoch, Trennlinie <code>divider</code>, Hover <code>background</code>. Zellen-Padding horizontal <code>md</code>. Text linksbuendig, Zahlen und Betraege rechtsbuendig. Datum immer TT.MM.JJJJ, Betrag immer 1.234,50 Euro. Aktionsspalte ganz rechts, nur Icon-Buttons. Keine Zebrastreifen.</p>
+
+      <h3>AppDialog</h3>
+      <div class="demo" style="justify-content:center;padding:22px">
+        <div class="card" style="max-width:420px;width:100%">
+          <div style="font-size:20px;font-weight:600;margin-bottom:8px">Anhaenger loeschen</div>
+          <p style="margin:0 0 18px;color:var(--ds-fg-muted);font-size:14px">Moechten Sie diesen Eintrag wirklich loeschen?</p>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <span class="btn btn-secondary">Abbrechen</span>
+            <span class="btn btn-danger">Loeschen</span>
+          </div>
+        </div>
+      </div>
+      <p class="hint">Breite 480, gross 640. Titel in <code>sectionTitle</code>, Inhalt Padding <code>lg</code>. Buttons unten rechts: links Abbrechen, rechts die Bestaetigung. Loeschdialoge nutzen danger statt primary.</p>
+
+      <h3>Navigation</h3>
+      <p class="hint"><code>NavigationView</code> mit linker <code>NavigationPane</code> im Modus <code>open</code>, Breite 260. Reihenfolge fest: Dashboard, Anhaenger, Schaeden, Kunden, Vertraege. Einstellungen immer im Fussbereich der Pane.</p>
+    </section>
+
+    <section id="formulare">
+      <h2><span class="num">06</span>Formulare</h2>
+      <div class="panel">
+        <ul class="check" style="gap:9px">
+          <li>Einspaltig, maximale Breite 560.</li>
+          <li>Pflichtfelder zuerst, optionale Felder danach.</li>
+          <li>Aktionsleiste unten rechts: Abbrechen, dann Speichern.</li>
+          <li>Validierung erst beim Verlassen des Feldes, nicht bei jedem Tastendruck.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="seitenaufbau">
+      <h2><span class="num">07</span>Seitenaufbau</h2>
+      <p class="hint">Jede Seite der Anwendung folgt derselben Reihenfolge. Das ist der wichtigste Punkt fuer ein einheitliches Ergebnis im Team.</p>
+      <div class="panel"><div class="layout">Seitentitel (AppText.pageTitle)        Aktionsleiste rechts
+                                       Primaeraktion ganz rechts
+--- AppSpacing.lg ---
+Filter- und Suchbereich (falls vorhanden)
+--- AppSpacing.md ---
+Inhalt (AppDataTable oder AppCard-Raster)</div></div>
+      <p class="hint" style="margin-top:14px">Detailseiten: links der Hauptinhalt, rechts ein Seitenbereich mit Breite 320 fuer Status, Standort und Metadaten.</p>
+    </section>
+
+    <section id="zustaende">
+      <h2><span class="num">08</span>Leer-, Lade- und Fehlerzustaende</h2>
+      <p class="hint">Jede Liste und jede Detailansicht muss alle drei Zustaende behandeln.</p>
+      <div class="states">
+        <div class="state">
+          <div class="ico"><div class="ring"></div></div>
+          <strong>AppLoadingState</strong>
+          <span>Daten werden geladen...</span>
+        </div>
+        <div class="state">
+          <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="13" height="9" rx="1.5"/><circle cx="7" cy="18" r="1.6"/><circle cx="14" cy="18" r="1.6"/><path d="M16 11h4l1 3v2h-5"/></svg></div>
+          <strong>AppEmptyState</strong>
+          <span>Keine Anhaenger vorhanden. Legen Sie den ersten Anhaenger an.</span>
+        </div>
+        <div class="state">
+          <div class="ico danger"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.4v.2"/></svg></div>
+          <strong>AppErrorState</strong>
+          <span>Die Daten konnten nicht geladen werden.</span>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:14px">Aufbau identisch: Icon 48 zentriert, darunter <code>md</code>, Titel in <code>cardTitle</code>, darunter <code>xs</code>, Beschreibung in <code>bodyMuted</code>, darunter <code>md</code>, dann der Button. Leerzustand nutzt primary, Fehlerzustand secondary mit dem Text Erneut versuchen.</p>
+    </section>
+
+    <section id="texte">
+      <h2><span class="num">09</span>Standardtexte</h2>
+      <p class="hint">Wortlaut nicht veraendern. Ohne diese Festlegung schreibt jede Person eine andere Fehlermeldung.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Situation</th><th>Text</th></tr>
+        <tr><td>Laden</td><td>Daten werden geladen...</td></tr>
+        <tr><td>Allgemeiner Fehler</td><td>Die Daten konnten nicht geladen werden.</td></tr>
+        <tr><td>Keine Anhaenger</td><td>Keine Anhaenger vorhanden. Legen Sie den ersten Anhaenger an.</td></tr>
+        <tr><td>Keine Schaeden</td><td>Fuer diesen Anhaenger sind keine Schaeden erfasst.</td></tr>
+        <tr><td>Keine Kunden</td><td>Keine Kunden vorhanden.</td></tr>
+        <tr><td>Keine Vertraege</td><td>Keine Mietvertraege vorhanden.</td></tr>
+        <tr><td>Kein Suchergebnis</td><td>Keine Ergebnisse fuer Ihre Suche.</td></tr>
+        <tr><td>Pflichtfeld leer</td><td>Dieses Feld ist erforderlich.</td></tr>
+        <tr><td>Ungueltige E-Mail</td><td>Bitte geben Sie eine gueltige E-Mail-Adresse ein.</td></tr>
+        <tr><td>Ungueltiger Zeitraum</td><td>Das Mietende muss nach dem Mietbeginn liegen.</td></tr>
+        <tr><td>Loeschen bestaetigen</td><td>Moechten Sie diesen Eintrag wirklich loeschen?</td></tr>
+        <tr><td>Erfolgreich gespeichert</td><td>Die Aenderungen wurden gespeichert.</td></tr>
+      </table></div>
+      <p class="hint" style="margin-top:14px">Buttontexte fest: Speichern, Abbrechen, Loeschen, Bearbeiten, Hinzufuegen, Schliessen, Erneut versuchen, Exportieren.</p>
+    </section>
+
+    <section id="checkliste">
+      <h2><span class="num">10</span>Checkliste vor dem Pull Request</h2>
+      <div class="panel">
+        <ul class="check">
+          <li>Keine rohen Farben, Abstaende, Radien oder TextStyles</li>
+          <li>Nur App-Komponenten verwendet</li>
+          <li>Seitenaufbau nach Abschnitt 07</li>
+          <li>Leer-, Lade- und Fehlerzustand vorhanden</li>
+          <li>Texte aus Abschnitt 09 uebernommen</li>
+          <li>Datum und Betrag im Standardformat</li>
+          <li>Keine neue Dependency</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>Stand 01.10.2026 · Gilt fuer alle Teammitglieder und alle KI-generierten Beitraege im Repository anhaenger-verwaltungssystem.</footer>
+</div>
