@@ -72,13 +72,9 @@ class AppEmptyState extends StatelessWidget {
 }
 
 class AppErrorState extends StatelessWidget {
-  const AppErrorState({
-    super.key,
-    this.message = AppStrings.errorGeneric,
-    this.onRetry,
-  });
+  const AppErrorState({super.key, this.message, this.onRetry});
 
-  final String message;
+  final String? message;
   final VoidCallback? onRetry;
 
   @override
@@ -94,8 +90,10 @@ class AppErrorState extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           const Text(AppStrings.errorGeneric, style: AppText.cardTitle),
-          const SizedBox(height: AppSpacing.xs),
-          Text(message, style: AppText.bodyMuted),
+          if (message != null) ...<Widget>[
+            const SizedBox(height: AppSpacing.xs),
+            Text(message!, style: AppText.bodyMuted),
+          ],
           if (onRetry != null) ...<Widget>[
             const SizedBox(height: AppSpacing.md),
             AppButton(label: AppStrings.actionRetry, onPressed: onRetry),

@@ -12,6 +12,7 @@ abstract final class AppIcons {
   static const IconData photo = FluentIcons.photo2;
   static const IconData location = FluentIcons.map_pin;
   static const IconData error = FluentIcons.error;
+  static const IconData user = FluentIcons.contact;
 
   static const IconData dashboard = FluentIcons.view_dashboard;
   static const IconData trailers = FluentIcons.car;

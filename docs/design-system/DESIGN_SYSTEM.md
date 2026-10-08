@@ -12,9 +12,9 @@
 2. Keine rohen Zahlen fuer Abstaende oder Radien. Immer `AppSpacing` / `AppRadius`.
 3. Keine rohen `TextStyle`. Immer `AppText`.
 4. Nie `Button`, `TextBox`, `ContentDialog` direkt im Feature-Code. Immer die `App*`-Komponenten.
-5. Jede Seite hat genau denselben Aufbau (siehe Abschnitt 8).
-6. Alle UI-Texte sind Deutsch. Fehler-, Lade- und Leer-Texte sind in Abschnitt 9 vorgegeben.
-7. Keine neuen Dependencies. Nur `fluent_ui`.
+5. Jede Seite hat genau denselben Aufbau (siehe Abschnitt 7).
+6. Alle UI-Texte sind Deutsch mit echten Umlauten (ä, ö, ü, ß) und stehen in `AppStrings`. Fehler-, Lade- und Leer-Texte sind in Abschnitt 9 vorgegeben.
+7. Keine neuen UI-Dependencies. Nur `fluent_ui`. Erlaubte Pakete insgesamt: siehe `pubspec.yaml` und ADRs.
 8. Keine Kommentare, keine Emojis im Code. Variablennamen Englisch.
 
 ---
@@ -44,6 +44,7 @@ abstract final class AppColors {
   static const statusRented = Color(0xFF0F6CBD);
   static const statusMaintenance = Color(0xFFCA5010);
   static const statusBlocked = Color(0xFF605E5C);
+  static const statusPlanned = Color(0xFF5C2E91);
 }
 ```
 
@@ -123,6 +124,7 @@ Nur `FluentIcons`. Feste Zuordnung, nicht abweichen:
 | Export | `FluentIcons.download` |
 | Foto | `FluentIcons.photo2` |
 | Standort | `FluentIcons.map_pin` |
+| Benutzer | `FluentIcons.contact` |
 
 Icongroesse: 16 in Buttons und Tabellen, 20 in der Navigation, 48 in Leerzustaenden.
 
@@ -151,6 +153,7 @@ Hintergrund `AppColors.surface`, Rahmen `AppColors.border`, Radius `AppRadius.md
 Kein Schatten. Optionaler Titel in `AppText.cardTitle`, darunter `AppSpacing.sm`.
 
 ### AppDataTable
+Verwendung: `AppDataTable<T>(columns: [AppDataColumn<T>(label:, cellBuilder:, flex:, isNumeric:)], rows:, onRowTap:, actionsBuilder:)`. Aktionen mit `AppIconButton`.
 Kopfzeile: `AppText.label`, Hintergrund `AppColors.background`, Hoehe 36.
 Datenzeile: Hoehe 40, Trennlinie `AppColors.divider`, Hover `AppColors.background`.
 Zellen-Padding horizontal `AppSpacing.md`.
@@ -160,6 +163,7 @@ Aktionsspalte immer ganz rechts, nur Icon-Buttons.
 Keine Zebrastreifen, keine Sortierpfeile ausser bei explizit sortierbaren Spalten.
 
 ### AppDialog
+Verwendung: `AppDialog(title:, content:, confirmLabel:, onConfirm:, isDestructive:, isLarge:)`. Löschbestätigung: `AppDialog.confirmDelete(context)` liefert `true` oder `false`.
 Breite 480 (gross: 640). Titel `AppText.sectionTitle`, Inhalt Padding `AppSpacing.lg`.
 Buttons unten rechts, Reihenfolge: links `secondary` Abbrechen, rechts `primary` Bestaetigen.
 Loeschdialoge nutzen `danger` statt `primary`.
@@ -170,17 +174,26 @@ Hoehe 22, horizontales Padding `AppSpacing.sm`, Radius `AppRadius.sm`, Text `App
 
 | Status | Text | Farbe |
 |---|---|---|
-| available | Verfuegbar | `statusAvailable` |
+| available | Verfügbar | `statusAvailable` |
 | rented | Vermietet | `statusRented` |
 | maintenance | In Wartung | `statusMaintenance` |
 | blocked | Gesperrt | `statusBlocked` |
 
-Vertragsstatus: Aktiv (`statusRented`), Abgeschlossen (`statusAvailable`), Storniert (`statusBlocked`).
+Vertragsstatus: Geplant (`statusPlanned`), Aktiv (`statusRented`), Abgeschlossen (`statusAvailable`), Storniert (`statusBlocked`).
+
+Verwendung: `AppStatusBadge.trailer(status)` oder `AppStatusBadge.contract(status)`.
 
 ### Navigation
 `NavigationView` mit linker `NavigationPane`, Modus `expanded`, Breite 260.
-Reihenfolge fest: Dashboard, Anhaenger, Schaeden, Kunden, Vertraege, Einstellungen.
-Einstellungen immer im Fussbereich der Pane.
+Reihenfolge fest: Dashboard, Anhänger, Schäden, Kunden, Verträge, Einstellungen.
+Einstellungen und „Angemeldet als …“ (Benutzer wechseln) immer im Fußbereich der Pane.
+
+### AppSelectField
+Auswahlfeld mit Label wie `AppTextField`. Verwendung: `AppSelectField<T>(label:, options: [AppSelectOption<T>(value:, label:)], value:, onChanged:)`.
+Als Wert immer eine ID oder ein Enum verwenden, nie ein Modellobjekt.
+
+### AppIconButton
+Nur Icon, Größe 16, mit Pflicht-Tooltip. Für Aktionsspalten in Tabellen. `isDestructive: true` nur für Löschen.
 
 ---
 
@@ -226,22 +239,26 @@ Gleicher Aufbau, Icon `FluentIcons.error` in `AppColors.danger`, Button `seconda
 
 ## 9. Standardtexte (nicht abweichen)
 
+Quelle der Wahrheit ist `lib/core/constants/app_strings.dart`.
+
 | Situation | Text |
 |---|---|
 | Laden | Daten werden geladen... |
 | Allgemeiner Fehler | Die Daten konnten nicht geladen werden. |
-| Keine Anhaenger | Keine Anhaenger vorhanden. Legen Sie den ersten Anhaenger an. |
-| Keine Schaeden | Fuer diesen Anhaenger sind keine Schaeden erfasst. |
+| Keine Anhänger | Keine Anhänger vorhanden. Legen Sie den ersten Anhänger an. |
+| Keine Schäden | Für diesen Anhänger sind keine Schäden erfasst. |
 | Keine Kunden | Keine Kunden vorhanden. |
-| Keine Vertraege | Keine Mietvertraege vorhanden. |
-| Kein Suchergebnis | Keine Ergebnisse fuer Ihre Suche. |
+| Keine Verträge | Keine Mietverträge vorhanden. |
+| Kein Suchergebnis | Keine Ergebnisse für Ihre Suche. |
 | Pflichtfeld leer | Dieses Feld ist erforderlich. |
-| Ungueltige E-Mail | Bitte geben Sie eine gueltige E-Mail-Adresse ein. |
-| Ungueltiger Zeitraum | Das Mietende muss nach dem Mietbeginn liegen. |
-| Loeschen bestaetigen | Moechten Sie diesen Eintrag wirklich loeschen? |
-| Erfolgreich gespeichert | Die Aenderungen wurden gespeichert. |
+| Ungültige E-Mail | Bitte geben Sie eine gültige E-Mail-Adresse ein. |
+| Ungültiger Zeitraum | Das Mietende muss nach dem Mietbeginn liegen. |
+| Löschen bestätigen | Möchten Sie diesen Eintrag wirklich löschen? |
+| Erfolgreich gespeichert | Die Änderungen wurden gespeichert. |
 
-Buttontexte fest: `Speichern`, `Abbrechen`, `Loeschen`, `Bearbeiten`, `Hinzufuegen`, `Schliessen`, `Erneut versuchen`, `Exportieren`.
+Fachliche Fehlermeldungen (z. B. Überschneidung von Verträgen) kommen aus `RepositoryException.message` und werden unverändert angezeigt.
+
+Buttontexte fest: `Speichern`, `Abbrechen`, `Löschen`, `Bearbeiten`, `Hinzufügen`, `Schließen`, `Erneut versuchen`, `Exportieren`, `Bestätigen`.
 
 ---
 

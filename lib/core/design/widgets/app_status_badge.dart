@@ -1,21 +1,31 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-import '../../../data/models/trailer_status.dart';
+import '../../../data/models/enums.dart';
 import '../app_colors.dart';
 import '../app_spacing.dart';
 import '../app_typography.dart';
 
 class AppStatusBadge extends StatelessWidget {
-  const AppStatusBadge.trailer(TrailerStatus status, {super.key})
-      : _trailerStatus = status,
-        _contractStatus = null;
+  AppStatusBadge.trailer(TrailerStatus status, {super.key})
+      : _text = status.label,
+        _color = switch (status) {
+          TrailerStatus.available => AppColors.statusAvailable,
+          TrailerStatus.rented => AppColors.statusRented,
+          TrailerStatus.maintenance => AppColors.statusMaintenance,
+          TrailerStatus.blocked => AppColors.statusBlocked,
+        };
 
-  const AppStatusBadge.contract(ContractStatus status, {super.key})
-      : _trailerStatus = null,
-        _contractStatus = status;
+  AppStatusBadge.contract(ContractStatus status, {super.key})
+      : _text = status.label,
+        _color = switch (status) {
+          ContractStatus.planned => AppColors.statusPlanned,
+          ContractStatus.active => AppColors.statusRented,
+          ContractStatus.completed => AppColors.statusAvailable,
+          ContractStatus.cancelled => AppColors.statusBlocked,
+        };
 
-  final TrailerStatus? _trailerStatus;
-  final ContractStatus? _contractStatus;
+  final String _text;
+  final Color _color;
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +42,5 @@ class AppStatusBadge extends StatelessWidget {
         style: AppText.caption.copyWith(color: AppColors.textOnAccent),
       ),
     );
-  }
-
-  String get _text => _trailerStatus?.label ?? _contractStatus?.label ?? '';
-
-  Color get _color {
-    final TrailerStatus? trailerStatus = _trailerStatus;
-    if (trailerStatus != null) {
-      return switch (trailerStatus) {
-        TrailerStatus.available => AppColors.statusAvailable,
-        TrailerStatus.rented => AppColors.statusRented,
-        TrailerStatus.maintenance => AppColors.statusMaintenance,
-        TrailerStatus.blocked => AppColors.statusBlocked,
-      };
-    }
-    final ContractStatus? contractStatus = _contractStatus;
-    if (contractStatus != null) {
-      return switch (contractStatus) {
-        ContractStatus.active => AppColors.statusRented,
-        ContractStatus.completed => AppColors.statusAvailable,
-        ContractStatus.cancelled => AppColors.statusBlocked,
-      };
-    }
-    return AppColors.statusBlocked;
   }
 }

@@ -12,6 +12,7 @@ enum TrailerStatus {
 }
 
 enum ContractStatus {
+  planned(AppStrings.contractStatusPlanned),
   active(AppStrings.contractStatusActive),
   completed(AppStrings.contractStatusCompleted),
   cancelled(AppStrings.contractStatusCancelled);
@@ -19,13 +20,16 @@ enum ContractStatus {
   const ContractStatus(this.label);
 
   final String label;
+
+  bool get blocksTrailer =>
+      this == ContractStatus.planned || this == ContractStatus.active;
 }
 
 enum DamageType {
-  accident('Unfall'),
-  vandalism('Vandalismus'),
-  wear('Verschleiss'),
-  other('Sonstiges');
+  accident(AppStrings.damageTypeAccident),
+  vandalism(AppStrings.damageTypeVandalism),
+  wear(AppStrings.damageTypeWear),
+  other(AppStrings.damageTypeOther);
 
   const DamageType(this.label);
 
@@ -33,9 +37,9 @@ enum DamageType {
 }
 
 enum DamageCause {
-  customer('Kunde'),
-  internal('Intern'),
-  unknown('Unbekannt');
+  customer(AppStrings.damageCauseCustomer),
+  internal(AppStrings.damageCauseInternal),
+  unknown(AppStrings.damageCauseUnknown);
 
   const DamageCause(this.label);
 
