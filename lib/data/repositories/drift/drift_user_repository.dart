@@ -21,8 +21,8 @@ class DriftUserRepository implements UserRepository {
       query.where(($AppUsersTable t) => t.isActive.equals(true));
     }
     return query.watch().map(
-          (List<AppUserRow> rows) => rows.map(_map).toList(),
-        );
+      (List<AppUserRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
@@ -43,9 +43,9 @@ class DriftUserRepository implements UserRepository {
       final String trimmed = name.trim();
       await _requireRow(id);
       await _ensureUniqueName(trimmed, excludeId: id);
-      await (_db.update(_db.appUsers)
-            ..where(($AppUsersTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.appUsers,
+      )..where(($AppUsersTable t) => t.id.equals(id))).write(
         AppUsersCompanion(
           name: Value<String>(trimmed),
           updatedAt: Value<DateTime>(DateTime.now()),
@@ -58,9 +58,9 @@ class DriftUserRepository implements UserRepository {
   Future<void> setActive(int id, {required bool isActive}) {
     return _db.transaction(() async {
       await _requireRow(id);
-      await (_db.update(_db.appUsers)
-            ..where(($AppUsersTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.appUsers,
+      )..where(($AppUsersTable t) => t.id.equals(id))).write(
         AppUsersCompanion(
           isActive: Value<bool>(isActive),
           updatedAt: Value<DateTime>(DateTime.now()),
@@ -70,9 +70,9 @@ class DriftUserRepository implements UserRepository {
   }
 
   Future<AppUserRow> _requireRow(int id) async {
-    final AppUserRow? row = await (_db.select(_db.appUsers)
-          ..where(($AppUsersTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final AppUserRow? row = await (_db.select(
+      _db.appUsers,
+    )..where(($AppUsersTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }
@@ -80,9 +80,9 @@ class DriftUserRepository implements UserRepository {
   }
 
   Future<void> _ensureUniqueName(String name, {int? excludeId}) async {
-    final List<AppUserRow> rows = await (_db.select(_db.appUsers)
-          ..where(($AppUsersTable t) => t.name.equals(name)))
-        .get();
+    final List<AppUserRow> rows = await (_db.select(
+      _db.appUsers,
+    )..where(($AppUsersTable t) => t.name.equals(name))).get();
     if (rows.any((AppUserRow row) => row.id != excludeId)) {
       throw const RepositoryException(RepositoryError.duplicateName);
     }

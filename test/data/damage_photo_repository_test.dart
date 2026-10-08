@@ -85,7 +85,9 @@ void main() {
     );
     await damages.create(draft(date: DateTime(2026, 6, 20)), userId: userId);
 
-    final List<DamageRecord> all = await damages.watchForTrailer(trailerId).first;
+    final List<DamageRecord> all = await damages
+        .watchForTrailer(trailerId)
+        .first;
     final List<DamageRecord> wear = await damages
         .watchForTrailer(
           trailerId,
@@ -99,32 +101,41 @@ void main() {
 
     expect(
       all.map((DamageRecord r) => r.eventDate),
-      <DateTime>[DateTime(2026, 6, 20), DateTime(2026, 3, 5), DateTime(2026, 1, 10)],
+      <DateTime>[
+        DateTime(2026, 6, 20),
+        DateTime(2026, 3, 5),
+        DateTime(2026, 1, 10),
+      ],
     );
     expect(wear.map((DamageRecord r) => r.eventDate), <DateTime>[
       DateTime(2026, 6, 20),
     ]);
   });
 
-  test('Fotos werden kopiert und beim Loeschen des Schadens entfernt',
-      () async {
-    final DamageRecord record = await damages.create(draft(), userId: userId);
+  test(
+    'Fotos werden kopiert und beim Loeschen des Schadens entfernt',
+    () async {
+      final DamageRecord record = await damages.create(draft(), userId: userId);
 
-    final Photo first = await photos.add(DamagePhotoOwner(record.id), source);
-    final Photo second = await photos.add(DamagePhotoOwner(record.id), source);
-    final File firstFile = photos.fileOf(first);
+      final Photo first = await photos.add(DamagePhotoOwner(record.id), source);
+      final Photo second = await photos.add(
+        DamagePhotoOwner(record.id),
+        source,
+      );
+      final File firstFile = photos.fileOf(first);
 
-    expect(first.filePath, startsWith('images/damages/${record.id}/'));
-    expect(first.filePath, endsWith('.jpg'));
-    expect(second.sortOrder, first.sortOrder + 1);
-    expect(firstFile.existsSync(), isTrue);
+      expect(first.filePath, startsWith('images/damages/${record.id}/'));
+      expect(first.filePath, endsWith('.jpg'));
+      expect(second.sortOrder, first.sortOrder + 1);
+      expect(firstFile.existsSync(), isTrue);
 
-    await damages.delete(record.id);
+      await damages.delete(record.id);
 
-    expect(await photos.watchFor(DamagePhotoOwner(record.id)).first, isEmpty);
-    expect(firstFile.existsSync(), isFalse);
-    expect(source.existsSync(), isTrue);
-  });
+      expect(await photos.watchFor(DamagePhotoOwner(record.id)).first, isEmpty);
+      expect(firstFile.existsSync(), isFalse);
+      expect(source.existsSync(), isTrue);
+    },
+  );
 
   test('Foto ersetzen tauscht die Datei aus', () async {
     final Photo photo = await photos.add(TrailerPhotoOwner(trailerId), source);
@@ -132,8 +143,9 @@ void main() {
 
     await photos.replace(photo.id, source);
 
-    final List<Photo> current =
-        await photos.watchFor(TrailerPhotoOwner(trailerId)).first;
+    final List<Photo> current = await photos
+        .watchFor(TrailerPhotoOwner(trailerId))
+        .first;
     expect(current, hasLength(1));
     expect(current.single.filePath, isNot(photo.filePath));
     expect(oldFile.existsSync(), isFalse);

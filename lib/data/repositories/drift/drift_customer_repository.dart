@@ -37,8 +37,8 @@ class DriftCustomerRepository implements CustomerRepository {
       );
     }
     return query.watch().map(
-          (List<CustomerRow> rows) => rows.map(_map).toList(),
-        );
+      (List<CustomerRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
@@ -52,7 +52,9 @@ class DriftCustomerRepository implements CustomerRepository {
   @override
   Future<Customer> create(CustomerDraft draft) {
     return _db.transaction(() async {
-      final int id = await _db.into(_db.customers).insert(
+      final int id = await _db
+          .into(_db.customers)
+          .insert(
             CustomersCompanion.insert(
               firstName: draft.firstName.trim(),
               lastName: draft.lastName.trim(),
@@ -72,9 +74,9 @@ class DriftCustomerRepository implements CustomerRepository {
   Future<void> update(int id, CustomerDraft draft) {
     return _db.transaction(() async {
       await _requireRow(id);
-      await (_db.update(_db.customers)
-            ..where(($CustomersTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.customers,
+      )..where(($CustomersTable t) => t.id.equals(id))).write(
         CustomersCompanion(
           firstName: Value<String>(draft.firstName.trim()),
           lastName: Value<String>(draft.lastName.trim()),
@@ -97,19 +99,18 @@ class DriftCustomerRepository implements CustomerRepository {
       if (row.archivedAt != null) {
         return;
       }
-      final List<RentalContractRow> contracts =
-          await (_db.select(_db.rentalContracts)
-                ..where(($RentalContractsTable t) => t.customerId.equals(id)))
-              .get();
+      final List<RentalContractRow> contracts = await (_db.select(
+        _db.rentalContracts,
+      )..where(($RentalContractsTable t) => t.customerId.equals(id))).get();
       if (contracts.any((RentalContractRow c) => c.status.blocksTrailer)) {
         throw const RepositoryException(
           RepositoryError.customerHasOpenContracts,
         );
       }
       final DateTime now = DateTime.now();
-      await (_db.update(_db.customers)
-            ..where(($CustomersTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.customers,
+      )..where(($CustomersTable t) => t.id.equals(id))).write(
         CustomersCompanion(
           archivedAt: Value<DateTime?>(now),
           updatedAt: Value<DateTime>(now),
@@ -119,9 +120,9 @@ class DriftCustomerRepository implements CustomerRepository {
   }
 
   Future<CustomerRow> _requireRow(int id) async {
-    final CustomerRow? row = await (_db.select(_db.customers)
-          ..where(($CustomersTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final CustomerRow? row = await (_db.select(
+      _db.customers,
+    )..where(($CustomersTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }

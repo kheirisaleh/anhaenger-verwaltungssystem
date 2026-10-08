@@ -50,7 +50,10 @@ class AppTextField extends StatelessWidget {
         ),
         if (hasError) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
-          Text(errorText!, style: AppText.caption.copyWith(color: AppColors.danger)),
+          Text(
+            errorText!,
+            style: AppText.caption.copyWith(color: AppColors.danger),
+          ),
         ],
       ],
     );

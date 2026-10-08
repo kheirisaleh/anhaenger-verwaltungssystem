@@ -27,8 +27,9 @@ void main() {
     expect(trailer.status, TrailerStatus.available);
     expect(trailer.licensePlate, 'B-AB 123');
 
-    final List<TrailerStatusChange> history =
-        await repository.watchStatusHistory(trailer.id).first;
+    final List<TrailerStatusChange> history = await repository
+        .watchStatusHistory(trailer.id)
+        .first;
     expect(history, hasLength(1));
     expect(history.single.oldStatus, isNull);
     expect(history.single.newStatus, TrailerStatus.available);
@@ -59,8 +60,9 @@ void main() {
 
     final Trailer? updated = await repository.watchById(trailer.id).first;
     expect(updated?.status, TrailerStatus.maintenance);
-    final List<TrailerStatusChange> history =
-        await repository.watchStatusHistory(trailer.id).first;
+    final List<TrailerStatusChange> history = await repository
+        .watchStatusHistory(trailer.id)
+        .first;
     expect(history.first.oldStatus, TrailerStatus.available);
     expect(history.first.newStatus, TrailerStatus.maintenance);
   });

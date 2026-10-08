@@ -11,8 +11,11 @@ abstract final class AppFormats {
 
   static final DateFormat _date = DateFormat('dd.MM.yyyy', locale);
   static final DateFormat _dateTime = DateFormat('dd.MM.yyyy HH:mm', locale);
-  static final NumberFormat _currency =
-      NumberFormat.currency(locale: locale, symbol: 'Euro', decimalDigits: 2);
+  static final NumberFormat _currency = NumberFormat.currency(
+    locale: locale,
+    symbol: 'Euro',
+    decimalDigits: 2,
+  );
 
   static String date(DateTime value) => _date.format(value.toLocal());
 

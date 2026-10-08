@@ -24,8 +24,8 @@ class DriftPhotoRepository implements PhotoRepository {
             ($PhotosTable t) => OrderingTerm.asc(t.id),
           ]);
     return select.watch().map(
-          (List<PhotoRow> rows) => rows.map(_map).toList(),
-        );
+      (List<PhotoRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
@@ -33,16 +33,19 @@ class DriftPhotoRepository implements PhotoRepository {
     final String relativePath = await _files.copyIn(owner, source);
     try {
       return await _db.transaction(() async {
-        final List<PhotoRow> existing = await (_db.select(_db.photos)
-              ..where(($PhotosTable t) => _ownerFilter(t, owner)))
-            .get();
-        final int nextOrder = existing.fold<int>(
+        final List<PhotoRow> existing = await (_db.select(
+          _db.photos,
+        )..where(($PhotosTable t) => _ownerFilter(t, owner))).get();
+        final int nextOrder =
+            existing.fold<int>(
               -1,
               (int highest, PhotoRow row) =>
                   row.sortOrder > highest ? row.sortOrder : highest,
             ) +
             1;
-        final int id = await _db.into(_db.photos).insert(
+        final int id = await _db
+            .into(_db.photos)
+            .insert(
               PhotosCompanion.insert(
                 trailerId: Value<int?>(
                   owner is TrailerPhotoOwner ? owner.id : null,
@@ -81,9 +84,9 @@ class DriftPhotoRepository implements PhotoRepository {
   @override
   Future<void> delete(int photoId) async {
     final PhotoRow row = await _requireRow(photoId);
-    await (_db.delete(_db.photos)
-          ..where(($PhotosTable t) => t.id.equals(photoId)))
-        .go();
+    await (_db.delete(
+      _db.photos,
+    )..where(($PhotosTable t) => t.id.equals(photoId))).go();
     await _files.delete(row.filePath);
   }
 
@@ -106,9 +109,9 @@ class DriftPhotoRepository implements PhotoRepository {
   }
 
   Future<PhotoRow> _requireRow(int id) async {
-    final PhotoRow? row = await (_db.select(_db.photos)
-          ..where(($PhotosTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final PhotoRow? row = await (_db.select(
+      _db.photos,
+    )..where(($PhotosTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }

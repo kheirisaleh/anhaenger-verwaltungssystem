@@ -35,36 +35,37 @@ class _AppRootState extends State<AppRoot> {
   Widget build(BuildContext context) {
     return FutureBuilder<AppDependencies>(
       future: _dependencies,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<AppDependencies> snapshot,
-      ) {
-        if (snapshot.hasError) {
-          return AppErrorState(
-            message: AppStrings.startupError,
-            onRetry: _retry,
-          );
-        }
-        final AppDependencies? dependencies = snapshot.data;
-        if (dependencies == null) {
-          return const AppLoadingState();
-        }
-        return AppScope(
-          dependencies: dependencies,
-          child: ValueListenableBuilder<AppUser?>(
-            valueListenable: dependencies.currentUser,
-            builder: (BuildContext context, AppUser? user, Widget? child) {
-              if (user == null) {
-                return const UserSelectionPage();
-              }
-              return AppShell(
-                user: user,
-                onSwitchUser: () => dependencies.currentUser.value = null,
+      builder:
+          (
+            BuildContext context,
+            AsyncSnapshot<AppDependencies> snapshot,
+          ) {
+            if (snapshot.hasError) {
+              return AppErrorState(
+                message: AppStrings.startupError,
+                onRetry: _retry,
               );
-            },
-          ),
-        );
-      },
+            }
+            final AppDependencies? dependencies = snapshot.data;
+            if (dependencies == null) {
+              return const AppLoadingState();
+            }
+            return AppScope(
+              dependencies: dependencies,
+              child: ValueListenableBuilder<AppUser?>(
+                valueListenable: dependencies.currentUser,
+                builder: (BuildContext context, AppUser? user, Widget? child) {
+                  if (user == null) {
+                    return const UserSelectionPage();
+                  }
+                  return AppShell(
+                    user: user,
+                    onSwitchUser: () => dependencies.currentUser.value = null,
+                  );
+                },
+              ),
+            );
+          },
     );
   }
 }

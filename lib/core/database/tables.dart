@@ -35,10 +35,10 @@ class Trailers extends Table {
   TextColumn get internalCode => text().unique()();
   TextColumn get licensePlate => text().unique()();
   IntColumn get trailerTypeId => integer().references(
-        TrailerTypes,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    TrailerTypes,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   TextColumn get status => textEnum<TrailerStatus>()();
   TextColumn get locationAddress => text().nullable()();
   RealColumn get locationLatitude => real().nullable()();
@@ -50,10 +50,10 @@ class Trailers extends Table {
 
   @override
   List<String> get customConstraints => <String>[
-        "CHECK (status IN ('available', 'rented', 'maintenance', 'blocked'))",
-        'CHECK (location_latitude IS NULL OR location_latitude BETWEEN -90 AND 90)',
-        'CHECK (location_longitude IS NULL OR location_longitude BETWEEN -180 AND 180)',
-      ];
+    "CHECK (status IN ('available', 'rented', 'maintenance', 'blocked'))",
+    'CHECK (location_latitude IS NULL OR location_latitude BETWEEN -90 AND 90)',
+    'CHECK (location_longitude IS NULL OR location_longitude BETWEEN -180 AND 180)',
+  ];
 }
 
 @DataClassName('TrailerStatusChangeRow')
@@ -67,27 +67,29 @@ class TrailerStatusChanges extends Table {
 
   IntColumn get id => integer().autoIncrement()();
   IntColumn get trailerId => integer().references(
-        Trailers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    Trailers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   TextColumn get oldStatus => textEnum<TrailerStatus>().nullable()();
   TextColumn get newStatus => textEnum<TrailerStatus>()();
   DateTimeColumn get changedAt => dateTime().withDefault(currentDateAndTime)();
   IntColumn get changedByUserId => integer().references(
-        AppUsers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
-  IntColumn get rentalContractId => integer()
-      .nullable()
-      .references(RentalContracts, #id, onDelete: KeyAction.restrict)();
+    AppUsers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
+  IntColumn get rentalContractId => integer().nullable().references(
+    RentalContracts,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
 
   @override
   List<String> get customConstraints => <String>[
-        "CHECK (old_status IS NULL OR old_status IN ('available', 'rented', 'maintenance', 'blocked'))",
-        "CHECK (new_status IN ('available', 'rented', 'maintenance', 'blocked'))",
-      ];
+    "CHECK (old_status IS NULL OR old_status IN ('available', 'rented', 'maintenance', 'blocked'))",
+    "CHECK (new_status IN ('available', 'rented', 'maintenance', 'blocked'))",
+  ];
 }
 
 @DataClassName('CustomerRow')
@@ -114,7 +116,10 @@ class Customers extends Table {
   name: 'rental_contract_trailer_idx',
   columns: <Symbol>{#trailerId, #startAt},
 )
-@TableIndex(name: 'rental_contract_customer_idx', columns: <Symbol>{#customerId})
+@TableIndex(
+  name: 'rental_contract_customer_idx',
+  columns: <Symbol>{#customerId},
+)
 @TableIndex(
   name: 'rental_contract_status_idx',
   columns: <Symbol>{#status, #startAt},
@@ -125,15 +130,15 @@ class RentalContracts extends Table {
 
   IntColumn get id => integer().autoIncrement()();
   IntColumn get customerId => integer().references(
-        Customers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    Customers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   IntColumn get trailerId => integer().references(
-        Trailers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    Trailers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   DateTimeColumn get startAt => dateTime()();
   DateTimeColumn get endAt => dateTime()();
   TextColumn get pickupLocation => text()();
@@ -143,19 +148,19 @@ class RentalContracts extends Table {
   DateTimeColumn get handedOverAt => dateTime().nullable()();
   DateTimeColumn get returnedAt => dateTime().nullable()();
   IntColumn get createdByUserId => integer().references(
-        AppUsers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    AppUsers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   List<String> get customConstraints => <String>[
-        'CHECK (end_at > start_at)',
-        'CHECK (price_cents >= 0)',
-        "CHECK (status IN ('planned', 'active', 'completed', 'cancelled'))",
-      ];
+    'CHECK (end_at > start_at)',
+    'CHECK (price_cents >= 0)',
+    "CHECK (status IN ('planned', 'active', 'completed', 'cancelled'))",
+  ];
 }
 
 @DataClassName('DamageRecordRow')
@@ -169,35 +174,39 @@ class DamageRecords extends Table {
 
   IntColumn get id => integer().autoIncrement()();
   IntColumn get trailerId => integer().references(
-        Trailers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    Trailers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   DateTimeColumn get eventDate => dateTime()();
   TextColumn get description => text()();
   TextColumn get damageType => textEnum<DamageType>()();
   TextColumn get causedBy => textEnum<DamageCause>()();
-  IntColumn get customerId => integer()
-      .nullable()
-      .references(Customers, #id, onDelete: KeyAction.restrict)();
-  IntColumn get rentalContractId => integer()
-      .nullable()
-      .references(RentalContracts, #id, onDelete: KeyAction.restrict)();
+  IntColumn get customerId => integer().nullable().references(
+    Customers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
+  IntColumn get rentalContractId => integer().nullable().references(
+    RentalContracts,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   IntColumn get costCents => integer().nullable()();
   IntColumn get createdByUserId => integer().references(
-        AppUsers,
-        #id,
-        onDelete: KeyAction.restrict,
-      )();
+    AppUsers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   List<String> get customConstraints => <String>[
-        'CHECK (cost_cents IS NULL OR cost_cents >= 0)',
-        "CHECK (damage_type IN ('accident', 'vandalism', 'wear', 'other'))",
-        "CHECK (caused_by IN ('customer', 'internal', 'unknown'))",
-      ];
+    'CHECK (cost_cents IS NULL OR cost_cents >= 0)',
+    "CHECK (damage_type IN ('accident', 'vandalism', 'wear', 'other'))",
+    "CHECK (caused_by IN ('customer', 'internal', 'unknown'))",
+  ];
 }
 
 @DataClassName('PhotoRow')
@@ -208,18 +217,22 @@ class Photos extends Table {
   String get tableName => 'photo';
 
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get trailerId => integer()
-      .nullable()
-      .references(Trailers, #id, onDelete: KeyAction.restrict)();
-  IntColumn get damageRecordId => integer()
-      .nullable()
-      .references(DamageRecords, #id, onDelete: KeyAction.cascade)();
+  IntColumn get trailerId => integer().nullable().references(
+    Trailers,
+    #id,
+    onDelete: KeyAction.restrict,
+  )();
+  IntColumn get damageRecordId => integer().nullable().references(
+    DamageRecords,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
   TextColumn get filePath => text().unique()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   List<String> get customConstraints => <String>[
-        'CHECK ((trailer_id IS NULL) <> (damage_record_id IS NULL))',
-      ];
+    'CHECK ((trailer_id IS NULL) <> (damage_record_id IS NULL))',
+  ];
 }

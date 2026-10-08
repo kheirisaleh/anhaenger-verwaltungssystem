@@ -43,8 +43,9 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double width =
-        isLarge ? AppSizes.dialogWidthLarge : AppSizes.dialogWidth;
+    final double width = isLarge
+        ? AppSizes.dialogWidthLarge
+        : AppSizes.dialogWidth;
     return ContentDialog(
       constraints: BoxConstraints(maxWidth: width),
       title: Text(title, style: AppText.sectionTitle),

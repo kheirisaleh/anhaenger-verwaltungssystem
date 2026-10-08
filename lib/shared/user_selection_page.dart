@@ -37,19 +37,22 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
           constraints: const BoxConstraints(maxWidth: AppSizes.formMaxWidth),
           child: StreamBuilder<List<AppUser>>(
             stream: _users,
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<List<AppUser>> snapshot,
-            ) {
-              if (snapshot.hasError) {
-                return const AppErrorState(message: AppStrings.startupError);
-              }
-              final List<AppUser>? users = snapshot.data;
-              if (users == null) {
-                return const AppLoadingState();
-              }
-              return _buildForm(users);
-            },
+            builder:
+                (
+                  BuildContext context,
+                  AsyncSnapshot<List<AppUser>> snapshot,
+                ) {
+                  if (snapshot.hasError) {
+                    return const AppErrorState(
+                      message: AppStrings.startupError,
+                    );
+                  }
+                  final List<AppUser>? users = snapshot.data;
+                  if (users == null) {
+                    return const AppLoadingState();
+                  }
+                  return _buildForm(users);
+                },
           ),
         ),
       ),
@@ -57,10 +60,9 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
   }
 
   Widget _buildForm(List<AppUser> users) {
-    final int? selectedId =
-        users.any((AppUser user) => user.id == _selectedId)
-            ? _selectedId
-            : null;
+    final int? selectedId = users.any((AppUser user) => user.id == _selectedId)
+        ? _selectedId
+        : null;
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -87,8 +89,8 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
               onPressed: selectedId == null
                   ? null
                   : () => _signIn(
-                        users.firstWhere((AppUser user) => user.id == selectedId),
-                      ),
+                      users.firstWhere((AppUser user) => user.id == selectedId),
+                    ),
             ),
           ),
         ],

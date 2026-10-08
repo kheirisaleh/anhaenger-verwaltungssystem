@@ -33,14 +33,34 @@ class _AppShellState extends State<AppShell> {
         displayMode: PaneDisplayMode.expanded,
         size: const NavigationPaneSize(openWidth: AppSizes.navigationPaneWidth),
         items: <NavigationPaneItem>[
-          _item(AppIcons.dashboard, AppStrings.navDashboard, const DashboardPage()),
-          _item(AppIcons.trailers, AppStrings.navTrailers, const TrailersPage()),
+          _item(
+            AppIcons.dashboard,
+            AppStrings.navDashboard,
+            const DashboardPage(),
+          ),
+          _item(
+            AppIcons.trailers,
+            AppStrings.navTrailers,
+            const TrailersPage(),
+          ),
           _item(AppIcons.damages, AppStrings.navDamages, const DamagesPage()),
-          _item(AppIcons.customers, AppStrings.navCustomers, const CustomersPage()),
-          _item(AppIcons.contracts, AppStrings.navContracts, const ContractsPage()),
+          _item(
+            AppIcons.customers,
+            AppStrings.navCustomers,
+            const CustomersPage(),
+          ),
+          _item(
+            AppIcons.contracts,
+            AppStrings.navContracts,
+            const ContractsPage(),
+          ),
         ],
         footerItems: <NavigationPaneItem>[
-          _item(AppIcons.settings, AppStrings.navSettings, const SettingsPage()),
+          _item(
+            AppIcons.settings,
+            AppStrings.navSettings,
+            const SettingsPage(),
+          ),
           PaneItemAction(
             icon: const Icon(AppIcons.user, size: AppSizes.iconNavigation),
             title: Text('${AppStrings.currentUser} ${widget.user.name}'),

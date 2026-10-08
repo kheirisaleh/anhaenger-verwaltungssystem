@@ -47,7 +47,9 @@ class AppSelectField<T> extends StatelessWidget {
             isExpanded: true,
             value: value,
             onChanged: onChanged,
-            placeholder: hint == null ? null : Text(hint, style: AppText.bodyMuted),
+            placeholder: hint == null
+                ? null
+                : Text(hint, style: AppText.bodyMuted),
             items: <ComboBoxItem<T>>[
               for (final AppSelectOption<T> option in options)
                 ComboBoxItem<T>(

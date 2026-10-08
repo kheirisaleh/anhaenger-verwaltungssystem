@@ -46,6 +46,9 @@ void main() {
     await types.delete(unused.id);
 
     final List<TrailerType> remaining = await types.watchAll().first;
-    expect(remaining.map((TrailerType t) => t.name), isNot(contains('Bootsanhänger')));
+    expect(
+      remaining.map((TrailerType t) => t.name),
+      isNot(contains('Bootsanhänger')),
+    );
   });
 }

@@ -18,9 +18,11 @@ AppDatabase createTestDatabase() {
 }
 
 Future<int> defaultUserId(AppDatabase db) async {
-  final AppUserRow user = await (db.select(db.appUsers)
-        ..where(($AppUsersTable t) => t.name.equals(AppDatabase.defaultUserName)))
-      .getSingle();
+  final AppUserRow user =
+      await (db.select(db.appUsers)..where(
+            ($AppUsersTable t) => t.name.equals(AppDatabase.defaultUserName),
+          ))
+          .getSingle();
   return user.id;
 }
 

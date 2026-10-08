@@ -7,22 +7,22 @@ import '../app_typography.dart';
 
 class AppStatusBadge extends StatelessWidget {
   AppStatusBadge.trailer(TrailerStatus status, {super.key})
-      : _text = status.label,
-        _color = switch (status) {
-          TrailerStatus.available => AppColors.statusAvailable,
-          TrailerStatus.rented => AppColors.statusRented,
-          TrailerStatus.maintenance => AppColors.statusMaintenance,
-          TrailerStatus.blocked => AppColors.statusBlocked,
-        };
+    : _text = status.label,
+      _color = switch (status) {
+        TrailerStatus.available => AppColors.statusAvailable,
+        TrailerStatus.rented => AppColors.statusRented,
+        TrailerStatus.maintenance => AppColors.statusMaintenance,
+        TrailerStatus.blocked => AppColors.statusBlocked,
+      };
 
   AppStatusBadge.contract(ContractStatus status, {super.key})
-      : _text = status.label,
-        _color = switch (status) {
-          ContractStatus.planned => AppColors.statusPlanned,
-          ContractStatus.active => AppColors.statusRented,
-          ContractStatus.completed => AppColors.statusAvailable,
-          ContractStatus.cancelled => AppColors.statusBlocked,
-        };
+    : _text = status.label,
+      _color = switch (status) {
+        ContractStatus.planned => AppColors.statusPlanned,
+        ContractStatus.active => AppColors.statusRented,
+        ContractStatus.completed => AppColors.statusAvailable,
+        ContractStatus.cancelled => AppColors.statusBlocked,
+      };
 
   final String _text;
   final Color _color;

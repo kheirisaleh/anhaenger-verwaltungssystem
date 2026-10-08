@@ -18,8 +18,8 @@ class DriftTrailerTypeRepository implements TrailerTypeRepository {
             ($TrailerTypesTable t) => OrderingTerm.asc(t.name),
           ]);
     return query.watch().map(
-          (List<TrailerTypeRow> rows) => rows.map(_map).toList(),
-        );
+      (List<TrailerTypeRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
@@ -40,9 +40,9 @@ class DriftTrailerTypeRepository implements TrailerTypeRepository {
       final String trimmed = name.trim();
       await _requireRow(id);
       await _ensureUniqueName(trimmed, excludeId: id);
-      await (_db.update(_db.trailerTypes)
-            ..where(($TrailerTypesTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.trailerTypes,
+      )..where(($TrailerTypesTable t) => t.id.equals(id))).write(
         TrailerTypesCompanion(
           name: Value<String>(trimmed),
           updatedAt: Value<DateTime>(DateTime.now()),
@@ -55,23 +55,24 @@ class DriftTrailerTypeRepository implements TrailerTypeRepository {
   Future<void> delete(int id) {
     return _db.transaction(() async {
       await _requireRow(id);
-      final TrailerRow? usedBy = await (_db.select(_db.trailers)
-            ..where(($TrailersTable t) => t.trailerTypeId.equals(id))
-            ..limit(1))
-          .getSingleOrNull();
+      final TrailerRow? usedBy =
+          await (_db.select(_db.trailers)
+                ..where(($TrailersTable t) => t.trailerTypeId.equals(id))
+                ..limit(1))
+              .getSingleOrNull();
       if (usedBy != null) {
         throw const RepositoryException(RepositoryError.trailerTypeInUse);
       }
-      await (_db.delete(_db.trailerTypes)
-            ..where(($TrailerTypesTable t) => t.id.equals(id)))
-          .go();
+      await (_db.delete(
+        _db.trailerTypes,
+      )..where(($TrailerTypesTable t) => t.id.equals(id))).go();
     });
   }
 
   Future<TrailerTypeRow> _requireRow(int id) async {
-    final TrailerTypeRow? row = await (_db.select(_db.trailerTypes)
-          ..where(($TrailerTypesTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final TrailerTypeRow? row = await (_db.select(
+      _db.trailerTypes,
+    )..where(($TrailerTypesTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }
@@ -79,9 +80,9 @@ class DriftTrailerTypeRepository implements TrailerTypeRepository {
   }
 
   Future<void> _ensureUniqueName(String name, {int? excludeId}) async {
-    final List<TrailerTypeRow> rows = await (_db.select(_db.trailerTypes)
-          ..where(($TrailerTypesTable t) => t.name.equals(name)))
-        .get();
+    final List<TrailerTypeRow> rows = await (_db.select(
+      _db.trailerTypes,
+    )..where(($TrailerTypesTable t) => t.name.equals(name))).get();
     if (rows.any((TrailerTypeRow row) => row.id != excludeId)) {
       throw const RepositoryException(RepositoryError.duplicateName);
     }

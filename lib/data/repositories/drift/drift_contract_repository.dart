@@ -16,11 +16,11 @@ class DriftContractRepository implements ContractRepository {
     ContractQuery query = const ContractQuery(),
   }) {
     final SimpleSelectStatement<$RentalContractsTable, RentalContractRow>
-        select = _db.select(_db.rentalContracts)
-          ..orderBy(<OrderClauseGenerator<$RentalContractsTable>>[
-            ($RentalContractsTable t) => OrderingTerm.desc(t.startAt),
-            ($RentalContractsTable t) => OrderingTerm.desc(t.id),
-          ]);
+    select = _db.select(_db.rentalContracts)
+      ..orderBy(<OrderClauseGenerator<$RentalContractsTable>>[
+        ($RentalContractsTable t) => OrderingTerm.desc(t.startAt),
+        ($RentalContractsTable t) => OrderingTerm.desc(t.id),
+      ]);
     final ContractStatus? status = query.status;
     if (status != null) {
       select.where(
@@ -40,8 +40,8 @@ class DriftContractRepository implements ContractRepository {
       );
     }
     return select.watch().map(
-          (List<RentalContractRow> rows) => rows.map(_map).toList(),
-        );
+      (List<RentalContractRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
@@ -59,7 +59,9 @@ class DriftContractRepository implements ContractRepository {
   }) {
     return _db.transaction(() async {
       await _validate(draft);
-      final int id = await _db.into(_db.rentalContracts).insert(
+      final int id = await _db
+          .into(_db.rentalContracts)
+          .insert(
             RentalContractsCompanion.insert(
               customerId: draft.customerId,
               trailerId: draft.trailerId,
@@ -194,9 +196,10 @@ class DriftContractRepository implements ContractRepository {
     if (trailer.archivedAt != null) {
       throw const RepositoryException(RepositoryError.trailerArchived);
     }
-    final CustomerRow? customer = await (_db.select(_db.customers)
-          ..where(($CustomersTable t) => t.id.equals(draft.customerId)))
-        .getSingleOrNull();
+    final CustomerRow? customer =
+        await (_db.select(_db.customers)
+              ..where(($CustomersTable t) => t.id.equals(draft.customerId)))
+            .getSingleOrNull();
     if (customer == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }
@@ -204,10 +207,9 @@ class DriftContractRepository implements ContractRepository {
       throw const RepositoryException(RepositoryError.customerArchived);
     }
     final List<RentalContractRow> others =
-        await (_db.select(_db.rentalContracts)
-              ..where(
-                ($RentalContractsTable t) => t.trailerId.equals(draft.trailerId),
-              ))
+        await (_db.select(_db.rentalContracts)..where(
+              ($RentalContractsTable t) => t.trailerId.equals(draft.trailerId),
+            ))
             .get();
     final bool overlaps = others.any(
       (RentalContractRow other) =>
@@ -231,15 +233,17 @@ class DriftContractRepository implements ContractRepository {
     if (trailer.status == status) {
       return;
     }
-    await (_db.update(_db.trailers)
-          ..where(($TrailersTable t) => t.id.equals(trailer.id)))
-        .write(
+    await (_db.update(
+      _db.trailers,
+    )..where(($TrailersTable t) => t.id.equals(trailer.id))).write(
       TrailersCompanion(
         status: Value<TrailerStatus>(status),
         updatedAt: Value<DateTime>(now),
       ),
     );
-    await _db.into(_db.trailerStatusChanges).insert(
+    await _db
+        .into(_db.trailerStatusChanges)
+        .insert(
           TrailerStatusChangesCompanion.insert(
             trailerId: trailer.id,
             oldStatus: Value<TrailerStatus?>(trailer.status),
@@ -252,9 +256,9 @@ class DriftContractRepository implements ContractRepository {
   }
 
   Future<RentalContractRow> _requireRow(int id) async {
-    final RentalContractRow? row = await (_db.select(_db.rentalContracts)
-          ..where(($RentalContractsTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final RentalContractRow? row = await (_db.select(
+      _db.rentalContracts,
+    )..where(($RentalContractsTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }
@@ -262,9 +266,9 @@ class DriftContractRepository implements ContractRepository {
   }
 
   Future<TrailerRow> _requireTrailer(int id) async {
-    final TrailerRow? row = await (_db.select(_db.trailers)
-          ..where(($TrailersTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final TrailerRow? row = await (_db.select(
+      _db.trailers,
+    )..where(($TrailersTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }
@@ -272,9 +276,9 @@ class DriftContractRepository implements ContractRepository {
   }
 
   Future<void> _write(int id, RentalContractsCompanion companion) {
-    return (_db.update(_db.rentalContracts)
-          ..where(($RentalContractsTable t) => t.id.equals(id)))
-        .write(companion);
+    return (_db.update(
+      _db.rentalContracts,
+    )..where(($RentalContractsTable t) => t.id.equals(id))).write(companion);
   }
 
   RentalContract _map(RentalContractRow row) {

@@ -55,7 +55,10 @@ class AppButton extends StatelessWidget {
         child: ProgressRing(strokeWidth: 2, activeColor: _foreground),
       );
     }
-    final Text text = Text(label, style: AppText.body.copyWith(color: _foreground));
+    final Text text = Text(
+      label,
+      style: AppText.body.copyWith(color: _foreground),
+    );
     if (icon == null) {
       return text;
     }
@@ -70,18 +73,18 @@ class AppButton extends StatelessWidget {
   }
 
   Color get _background => switch (variant) {
-        AppButtonVariant.primary => AppColors.accent,
-        AppButtonVariant.secondary => AppColors.surface,
-        AppButtonVariant.danger => AppColors.danger,
-        AppButtonVariant.subtle => const Color(0x00000000),
-      };
+    AppButtonVariant.primary => AppColors.accent,
+    AppButtonVariant.secondary => AppColors.surface,
+    AppButtonVariant.danger => AppColors.danger,
+    AppButtonVariant.subtle => const Color(0x00000000),
+  };
 
   Color get _foreground => switch (variant) {
-        AppButtonVariant.primary => AppColors.textOnAccent,
-        AppButtonVariant.secondary => AppColors.textPrimary,
-        AppButtonVariant.danger => AppColors.textOnAccent,
-        AppButtonVariant.subtle => AppColors.accent,
-      };
+    AppButtonVariant.primary => AppColors.textOnAccent,
+    AppButtonVariant.secondary => AppColors.textPrimary,
+    AppButtonVariant.danger => AppColors.textOnAccent,
+    AppButtonVariant.subtle => AppColors.accent,
+  };
 
   Color get _borderColor => variant == AppButtonVariant.secondary
       ? AppColors.border

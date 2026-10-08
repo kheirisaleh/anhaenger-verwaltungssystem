@@ -46,15 +46,17 @@ class DriftDamageRepository implements DamageRepository {
       );
     }
     return select.watch().map(
-          (List<DamageRecordRow> rows) => rows.map(_map).toList(),
-        );
+      (List<DamageRecordRow> rows) => rows.map(_map).toList(),
+    );
   }
 
   @override
   Future<DamageRecord> create(DamageRecordDraft draft, {required int userId}) {
     return _db.transaction(() async {
       _validate(draft);
-      final int id = await _db.into(_db.damageRecords).insert(
+      final int id = await _db
+          .into(_db.damageRecords)
+          .insert(
             DamageRecordsCompanion.insert(
               trailerId: draft.trailerId,
               eventDate: _dateOnly(draft.eventDate),
@@ -76,9 +78,9 @@ class DriftDamageRepository implements DamageRepository {
     return _db.transaction(() async {
       await _requireRow(id);
       _validate(draft);
-      await (_db.update(_db.damageRecords)
-            ..where(($DamageRecordsTable t) => t.id.equals(id)))
-          .write(
+      await (_db.update(
+        _db.damageRecords,
+      )..where(($DamageRecordsTable t) => t.id.equals(id))).write(
         DamageRecordsCompanion(
           trailerId: Value<int>(draft.trailerId),
           eventDate: Value<DateTime>(_dateOnly(draft.eventDate)),
@@ -98,12 +100,12 @@ class DriftDamageRepository implements DamageRepository {
   Future<void> delete(int id) async {
     final List<String> filePaths = await _db.transaction(() async {
       await _requireRow(id);
-      final List<PhotoRow> photos = await (_db.select(_db.photos)
-            ..where(($PhotosTable t) => t.damageRecordId.equals(id)))
-          .get();
-      await (_db.delete(_db.damageRecords)
-            ..where(($DamageRecordsTable t) => t.id.equals(id)))
-          .go();
+      final List<PhotoRow> photos = await (_db.select(
+        _db.photos,
+      )..where(($PhotosTable t) => t.damageRecordId.equals(id))).get();
+      await (_db.delete(
+        _db.damageRecords,
+      )..where(($DamageRecordsTable t) => t.id.equals(id))).go();
       return photos.map((PhotoRow photo) => photo.filePath).toList();
     });
     for (final String path in filePaths) {
@@ -127,9 +129,9 @@ class DriftDamageRepository implements DamageRepository {
   }
 
   Future<DamageRecordRow> _requireRow(int id) async {
-    final DamageRecordRow? row = await (_db.select(_db.damageRecords)
-          ..where(($DamageRecordsTable t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final DamageRecordRow? row = await (_db.select(
+      _db.damageRecords,
+    )..where(($DamageRecordsTable t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) {
       throw const RepositoryException(RepositoryError.notFound);
     }

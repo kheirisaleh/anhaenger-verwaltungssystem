@@ -21,7 +21,11 @@ void main() {
   final DateTime start = DateTime(2026, 11, 2, 9);
   final DateTime end = DateTime(2026, 11, 4, 18);
 
-  RentalContractDraft draft({DateTime? from, DateTime? until, int price = 4990}) {
+  RentalContractDraft draft({
+    DateTime? from,
+    DateTime? until,
+    int price = 4990,
+  }) {
     return RentalContractDraft(
       customerId: customerId,
       trailerId: trailerId,
@@ -45,8 +49,10 @@ void main() {
   tearDown(() => db.close());
 
   test('neuer Vertrag ist geplant und aendert den Anhaenger nicht', () async {
-    final RentalContract contract =
-        await contracts.create(draft(), userId: userId);
+    final RentalContract contract = await contracts.create(
+      draft(),
+      userId: userId,
+    );
 
     expect(contract.status, ContractStatus.planned);
     expect(contract.isEditable, isTrue);
@@ -56,7 +62,10 @@ void main() {
 
   test('ungueltiger Zeitraum und negativer Preis werden abgelehnt', () async {
     await expectLater(
-      contracts.create(draft(from: end, until: start), userId: userId),
+      contracts.create(
+        draft(from: end, until: start),
+        userId: userId,
+      ),
       throwsRepositoryError(RepositoryError.invalidDateRange),
     );
     await expectLater(
@@ -81,7 +90,10 @@ void main() {
   });
 
   test('angrenzende und stornierte Vertraege blockieren nicht', () async {
-    final RentalContract first = await contracts.create(draft(), userId: userId);
+    final RentalContract first = await contracts.create(
+      draft(),
+      userId: userId,
+    );
     await contracts.create(
       draft(from: end, until: DateTime(2026, 11, 6, 18)),
       userId: userId,
@@ -96,8 +108,10 @@ void main() {
   });
 
   test('Uebergabe und Rueckgabe steuern den Anhaengerstatus', () async {
-    final RentalContract contract =
-        await contracts.create(draft(), userId: userId);
+    final RentalContract contract = await contracts.create(
+      draft(),
+      userId: userId,
+    );
 
     await contracts.handOver(contract.id, userId: userId);
     expect(
@@ -118,8 +132,9 @@ void main() {
     );
 
     await contracts.completeReturn(contract.id, userId: userId);
-    final RentalContract? returned =
-        await contracts.watchById(contract.id).first;
+    final RentalContract? returned = await contracts
+        .watchById(contract.id)
+        .first;
     expect(returned?.status, ContractStatus.completed);
     expect(returned?.returnedAt, isNotNull);
     expect(
@@ -127,17 +142,22 @@ void main() {
       TrailerStatus.available,
     );
 
-    final List<TrailerStatusChange> history =
-        await trailers.watchStatusHistory(trailerId).first;
+    final List<TrailerStatusChange> history = await trailers
+        .watchStatusHistory(trailerId)
+        .first;
     expect(
-      history.where((TrailerStatusChange c) => c.rentalContractId == contract.id),
+      history.where(
+        (TrailerStatusChange c) => c.rentalContractId == contract.id,
+      ),
       hasLength(2),
     );
   });
 
   test('Uebergabe nur bei verfuegbarem Anhaenger', () async {
-    final RentalContract contract =
-        await contracts.create(draft(), userId: userId);
+    final RentalContract contract = await contracts.create(
+      draft(),
+      userId: userId,
+    );
     await trailers.changeStatus(
       trailerId,
       TrailerStatus.maintenance,
@@ -151,8 +171,10 @@ void main() {
   });
 
   test('nur geplante Vertraege sind bearbeitbar und stornierbar', () async {
-    final RentalContract contract =
-        await contracts.create(draft(), userId: userId);
+    final RentalContract contract = await contracts.create(
+      draft(),
+      userId: userId,
+    );
     await contracts.update(contract.id, draft(price: 5990));
     expect(
       (await contracts.watchById(contract.id).first)?.priceCents,
@@ -171,17 +193,19 @@ void main() {
     );
   });
 
-  test('Anhaenger und Kunden mit offenen Vertraegen sind nicht archivierbar',
-      () async {
-    await contracts.create(draft(), userId: userId);
+  test(
+    'Anhaenger und Kunden mit offenen Vertraegen sind nicht archivierbar',
+    () async {
+      await contracts.create(draft(), userId: userId);
 
-    await expectLater(
-      trailers.archive(trailerId),
-      throwsRepositoryError(RepositoryError.trailerHasOpenContracts),
-    );
-    await expectLater(
-      DriftCustomerRepository(db).archive(customerId),
-      throwsRepositoryError(RepositoryError.customerHasOpenContracts),
-    );
-  });
+      await expectLater(
+        trailers.archive(trailerId),
+        throwsRepositoryError(RepositoryError.trailerHasOpenContracts),
+      );
+      await expectLater(
+        DriftCustomerRepository(db).archive(customerId),
+        throwsRepositoryError(RepositoryError.customerHasOpenContracts),
+      );
+    },
+  );
 }

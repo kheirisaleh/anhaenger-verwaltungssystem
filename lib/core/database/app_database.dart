@@ -27,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   AppDatabase.open(AppDirectories directories)
-      : super(_openConnection(directories));
+    : super(_openConnection(directories));
 
   static const String defaultUserName = 'Administrator';
 
@@ -44,14 +44,14 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator migrator) async {
-          await migrator.createAll();
-          await _insertDefaults();
-        },
-        beforeOpen: (OpeningDetails details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (Migrator migrator) async {
+      await migrator.createAll();
+      await _insertDefaults();
+    },
+    beforeOpen: (OpeningDetails details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
   Future<void> _insertDefaults() async {
     await into(appUsers).insert(

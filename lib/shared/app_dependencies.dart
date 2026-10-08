@@ -84,8 +84,8 @@ class AppScope extends InheritedWidget {
   final AppDependencies dependencies;
 
   static AppDependencies of(BuildContext context) {
-    final AppScope? scope =
-        context.dependOnInheritedWidgetOfExactType<AppScope>();
+    final AppScope? scope = context
+        .dependOnInheritedWidgetOfExactType<AppScope>();
     assert(scope != null, 'AppScope fehlt im Widget-Baum.');
     return scope!.dependencies;
   }
