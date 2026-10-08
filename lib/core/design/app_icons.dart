@@ -9,10 +9,20 @@ abstract final class AppIcons {
   static const IconData filter = FluentIcons.filter;
   static const IconData back = FluentIcons.back;
   static const IconData export = FluentIcons.download;
+  static const IconData importData = FluentIcons.upload;
   static const IconData photo = FluentIcons.photo2;
   static const IconData location = FluentIcons.map_pin;
   static const IconData error = FluentIcons.error;
   static const IconData user = FluentIcons.contact;
+  static const IconData restore = FluentIcons.undo;
+  static const IconData status = FluentIcons.sync;
+  static const IconData handOver = FluentIcons.forward;
+  static const IconData returnTrailer = FluentIcons.return_key;
+  static const IconData cancel = FluentIcons.cancel;
+  static const IconData backup = FluentIcons.database;
+  static const IconData history = FluentIcons.history;
+  static const IconData open = FluentIcons.chevron_right;
+  static const IconData sampleData = FluentIcons.refresh;
 
   static const IconData dashboard = FluentIcons.view_dashboard;
   static const IconData trailers = FluentIcons.car;

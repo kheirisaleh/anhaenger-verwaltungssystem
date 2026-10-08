@@ -195,6 +195,17 @@ Als Wert immer eine ID oder ein Enum verwenden, nie ein Modellobjekt.
 ### AppIconButton
 Nur Icon, Größe 16, mit Pflicht-Tooltip. Für Aktionsspalten in Tabellen. `isDestructive: true` nur für Löschen.
 
+### Weitere Komponenten
+
+| Komponente | Zweck |
+|---|---|
+| `AppForm`, `AppFormRow` | Formular-Inhalt für Dialoge mit Fehlerkasten oben, Abstand `AppSpacing.md`, Zweierzeilen |
+| `AppDateTimeField` | Datum (und optional Uhrzeit) mit Label wie `AppTextField` |
+| `AppCheckbox` | Checkbox mit Text, z. B. „Archivierte anzeigen“ |
+| `AppSearchField` | Suchfeld mit Lupe für Filterleisten |
+| `AppMessages.success` / `.error` | Meldungsleiste unten nach Aktionen |
+| `AppStatTile`, `AppBarChart`, `AppLineChart`, `AppKeyValue` | Dashboard-Kacheln, Diagramme, Beschriftung/Wert in Seitenleisten |
+
 ---
 
 ## 6. Formulare

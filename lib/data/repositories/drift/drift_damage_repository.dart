@@ -18,13 +18,32 @@ class DriftDamageRepository implements DamageRepository {
     int trailerId, {
     DamageFilter filter = const DamageFilter(),
   }) {
+    return watchAll(
+      filter: DamageFilter(
+        trailerId: trailerId,
+        damageType: filter.damageType,
+        from: filter.from,
+        until: filter.until,
+      ),
+    );
+  }
+
+  @override
+  Stream<List<DamageRecord>> watchAll({
+    DamageFilter filter = const DamageFilter(),
+  }) {
     final SimpleSelectStatement<$DamageRecordsTable, DamageRecordRow> select =
         _db.select(_db.damageRecords)
-          ..where(($DamageRecordsTable t) => t.trailerId.equals(trailerId))
           ..orderBy(<OrderClauseGenerator<$DamageRecordsTable>>[
             ($DamageRecordsTable t) => OrderingTerm.desc(t.eventDate),
             ($DamageRecordsTable t) => OrderingTerm.desc(t.id),
           ]);
+    final int? trailerId = filter.trailerId;
+    if (trailerId != null) {
+      select.where(
+        ($DamageRecordsTable t) => t.trailerId.equals(trailerId),
+      );
+    }
     final DamageType? damageType = filter.damageType;
     if (damageType != null) {
       select.where(

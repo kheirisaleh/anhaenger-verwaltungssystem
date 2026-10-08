@@ -25,15 +25,32 @@ class AppDataTable<T> extends StatelessWidget {
     required this.rows,
     this.onRowTap,
     this.actionsBuilder,
+    this.actionsWidth = 120,
+    this.shrinkWrap = false,
   });
 
   final List<AppDataColumn<T>> columns;
   final List<T> rows;
   final ValueChanged<T>? onRowTap;
   final List<Widget> Function(T item)? actionsBuilder;
+  final double actionsWidth;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
+    final ValueChanged<T>? tap = onRowTap;
+    final Widget list = ListView.builder(
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
+      itemCount: rows.length,
+      itemBuilder: (BuildContext context, int index) {
+        final T item = rows[index];
+        return _AppDataRow(
+          onTap: tap == null ? null : () => tap(item),
+          child: _buildCells(item),
+        );
+      },
+    );
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -42,17 +59,10 @@ class AppDataTable<T> extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
+        mainAxisSize: shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
         children: <Widget>[
           _buildHeader(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: rows.length,
-              itemBuilder: (BuildContext context, int index) => _AppDataRow(
-                onTap: onRowTap == null ? null : () => onRowTap!(rows[index]),
-                child: _buildCells(rows[index]),
-              ),
-            ),
-          ),
+          if (shrinkWrap) list else Expanded(child: list),
         ],
       ),
     );
@@ -68,17 +78,22 @@ class AppDataTable<T> extends StatelessWidget {
             Expanded(
               flex: column.flex,
               child: _cell(
-                Text(column.label, style: AppText.label),
+                Text(
+                  column.label,
+                  style: AppText.label,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 isNumeric: column.isNumeric,
               ),
             ),
-          if (actionsBuilder != null) const SizedBox(width: _actionsWidth),
+          if (actionsBuilder != null) SizedBox(width: actionsWidth),
         ],
       ),
     );
   }
 
   Widget _buildCells(T item) {
+    final List<Widget> Function(T item)? actions = actionsBuilder;
     return Row(
       children: <Widget>[
         for (final AppDataColumn<T> column in columns)
@@ -86,12 +101,12 @@ class AppDataTable<T> extends StatelessWidget {
             flex: column.flex,
             child: _cell(column.cellBuilder(item), isNumeric: column.isNumeric),
           ),
-        if (actionsBuilder != null)
+        if (actions != null)
           SizedBox(
-            width: _actionsWidth,
+            width: actionsWidth,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: actionsBuilder!(item),
+              children: actions(item),
             ),
           ),
       ],
@@ -107,8 +122,23 @@ class AppDataTable<T> extends StatelessWidget {
       ),
     );
   }
+}
 
-  static const double _actionsWidth = 120;
+class AppTableText extends StatelessWidget {
+  const AppTableText(this.text, {super.key, this.isMuted = false});
+
+  final String text;
+  final bool isMuted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: isMuted ? AppText.bodyMuted : AppText.body,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+    );
+  }
 }
 
 class _AppDataRow extends StatefulWidget {

@@ -28,5 +28,7 @@ abstract interface class TrailerRepository {
 
   Future<void> archive(int id);
 
+  Future<void> restore(int id);
+
   Stream<List<TrailerStatusChange>> watchStatusHistory(int trailerId);
 }

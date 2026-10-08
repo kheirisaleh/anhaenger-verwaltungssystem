@@ -1,6 +1,10 @@
 import '../models/damage_record.dart';
 
 abstract interface class DamageRepository {
+  Stream<List<DamageRecord>> watchAll({
+    DamageFilter filter = const DamageFilter(),
+  });
+
   Stream<List<DamageRecord>> watchForTrailer(
     int trailerId, {
     DamageFilter filter = const DamageFilter(),

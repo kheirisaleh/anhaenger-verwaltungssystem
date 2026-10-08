@@ -53,8 +53,9 @@ class DamageRecordDraft {
 }
 
 class DamageFilter {
-  const DamageFilter({this.damageType, this.from, this.until});
+  const DamageFilter({this.trailerId, this.damageType, this.from, this.until});
 
+  final int? trailerId;
   final DamageType? damageType;
   final DateTime? from;
   final DateTime? until;

@@ -47,7 +47,7 @@ class AppDialog extends StatelessWidget {
         ? AppSizes.dialogWidthLarge
         : AppSizes.dialogWidth;
     return ContentDialog(
-      constraints: BoxConstraints(maxWidth: width),
+      constraints: BoxConstraints(maxWidth: width, maxHeight: 760),
       title: Text(title, style: AppText.sectionTitle),
       content: content,
       actions: <Widget>[

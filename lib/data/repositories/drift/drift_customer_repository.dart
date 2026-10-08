@@ -119,6 +119,21 @@ class DriftCustomerRepository implements CustomerRepository {
     });
   }
 
+  @override
+  Future<void> restore(int id) {
+    return _db.transaction(() async {
+      await _requireRow(id);
+      await (_db.update(
+        _db.customers,
+      )..where(($CustomersTable t) => t.id.equals(id))).write(
+        CustomersCompanion(
+          archivedAt: const Value<DateTime?>(null),
+          updatedAt: Value<DateTime>(DateTime.now()),
+        ),
+      );
+    });
+  }
+
   Future<CustomerRow> _requireRow(int id) async {
     final CustomerRow? row = await (_db.select(
       _db.customers,

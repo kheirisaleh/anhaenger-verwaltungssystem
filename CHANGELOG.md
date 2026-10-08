@@ -4,6 +4,18 @@ Alle relevanten Änderungen am Projekt werden hier festgehalten.
 
 ## [Unreleased]
 
+### Added (Verwaltungsoberfläche)
+
+- Vollständige Seiten für Dashboard, Anhänger, Schäden, Kunden, Verträge und Einstellungen
+- Detailseiten für Anhänger und Kunden, Fotogalerie, Statusverlauf
+- Vertragsablauf in der Oberfläche: Übergabe, Rücknahme, Stornierung
+- Archivieren und Wiederherstellen von Anhängern und Kunden
+- Datensicherung (Export/Import) und CSV-Export
+- Beispieldaten beim ersten Start
+- Komponenten `AppDateTimeField`, `AppCheckbox`, `AppSearchField`, `AppForm`, `AppMessages`, Diagramme und Kennzahl-Kacheln
+- ADR-005 Kennzahlen, Datensicherung und Bedienkonzept
+- Bedien-Test aller Bereiche mit Beispieldaten
+
 ### Added
 
 - Projektstruktur mit `docs/` und `.github/`

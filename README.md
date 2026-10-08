@@ -6,9 +6,18 @@ Schulprojekt: Verwaltungsoberfläche für eine Anhängervermietung. Die Anwendun
 
 ## Status
 
-Phase: **Foundation abgeschlossen, bereit für Feature-Entwicklung.**
+Phase: **Alle Verwaltungsfunktionen der Admin-Oberfläche sind benutzbar.**
 
-Vorhanden: Datenbank mit allen Tabellen, Repositories mit den Fachregeln (Statusprotokoll, Übergabe/Rückgabe, Überschneidungsprüfung), Design-System-Komponenten, Benutzerauswahl, Navigation, Tests und CI. Die Seiten der Features sind noch Platzhalter.
+| Bereich | Funktionen |
+|---|---|
+| Dashboard | Fuhrpark-Status, Auslastung, Umsatz und Vermietungen mit Vorjahresvergleich, offene Verträge, Ø Mietdauer, beliebteste Typen, Diagramme, CSV-Export |
+| Anhänger | Liste mit Suche und Statusfilter, anlegen, bearbeiten, löschen (Archiv), wiederherstellen, Detailseite mit Status, Standort, Fotos, Schäden, Verträgen und Statusverlauf |
+| Schäden | Gesamtliste und je Anhänger, Filter nach Art und Zeitraum, erfassen, bearbeiten, löschen, Fotos |
+| Kunden | Liste mit Suche, anlegen, bearbeiten, löschen (Archiv), wiederherstellen, Detailseite mit Vertragshistorie |
+| Verträge | Liste mit Statusfilter, anlegen, bearbeiten, übergeben, zurücknehmen, stornieren, CSV-Export |
+| Einstellungen | Benutzer, Anhängertypen, Datensicherung (Export/Import), Beispieldaten |
+
+Beim ersten Start wird eine leere Datenbank automatisch mit Beispieldaten gefüllt (Anhänger wie „BLITZ-01“, Kunden wie „Rainer Zufall“).
 
 Details: [docs/project/PROJECT_STATUS.md](docs/project/PROJECT_STATUS.md)
 
@@ -32,7 +41,6 @@ flutter analyze
 flutter test
 ```
 
-Beim ersten Start wird die Datenbank mit dem Benutzer „Administrator“ und fünf Anhängertypen angelegt.
 
 ## Fertige Versionen ohne eigenen Build
 

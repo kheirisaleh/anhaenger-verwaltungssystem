@@ -37,19 +37,20 @@ flutter run -d macos       # bzw. -d windows
 1. **Offline.** Keine Netzwerkaufrufe, keine Cloud-Dienste, keine externen Bild-URLs.
 2. **Schichten.** `presentation -> application -> Repository-Schnittstelle -> Drift-Implementierung -> SQLite`. Widgets und Controller kennen nur Schnittstellen aus `lib/data/repositories/`, nie `Drift*Repository`, `AppDatabase` oder `*Row`-Klassen. Ein Feature importiert kein anderes Feature.
 3. **Fachregeln** stehen in den Repository-Implementierungen und werden als `RepositoryException` gemeldet. Nicht in Widgets duplizieren. Neue Fachregel = neuer Test in `test/data/`.
-4. **State.** `ChangeNotifier`-Controller in `features/<x>/application/`, Repositories über den Konstruktor, in der Seite aus `AppScope.of(context)`. Kein Riverpod, provider, BLoC, go_router (ADR-004).
-5. **Design System.** Keine rohen Farben, Abstände, Radien oder `TextStyle`s. Nur `AppColors`, `AppSpacing`, `AppSizes`, `AppRadius`, `AppText`, `AppIcons`. Keine `fluent_ui`-Basis-Widgets (`Button`, `TextBox`, `ComboBox`, `ContentDialog`) im Feature-Code, sondern `App*`-Komponenten aus `lib/core/design/widgets/`.
-6. **Texte.** Alle UI-Texte in `lib/core/constants/app_strings.dart`, mit echten Umlauten. Keine hartcodierten Strings in Widgets.
-7. **Daten.** Geld als `int` in Cent, Anzeige mit `AppFormats.currencyFromCents`. Datum mit `AppFormats.date`. Aktionen mit Protokoll brauchen die `userId` aus `AppScope.of(context).currentUser`.
-8. **Code-Stil.** Bezeichner Englisch. Keine Kommentare, keine Emojis im Code. Explizite Typen wie im bestehenden Code. Lint-Regeln aus `analysis_options.yaml`.
-9. **Kleine Änderungen.** Nur Dateien ändern, die die Aufgabe betrifft.
+4. **Dialoge und Seiten** mit `showScopedDialog` / `pushScopedPage` aus `lib/shared/scoped_navigation.dart` öffnen, sonst fehlt `AppScope` (Absturz). Rückmeldungen mit `AppMessages`, Aktionen mit `runAction`.
+5. **State.** `ChangeNotifier`-Controller in `features/<x>/application/`, Repositories über den Konstruktor, in der Seite aus `AppScope.of(context)`. Kein Riverpod, provider, BLoC, go_router (ADR-004).
+6. **Design System.** Keine rohen Farben, Abstände, Radien oder `TextStyle`s. Nur `AppColors`, `AppSpacing`, `AppSizes`, `AppRadius`, `AppText`, `AppIcons`. Keine `fluent_ui`-Basis-Widgets (`Button`, `TextBox`, `ComboBox`, `ContentDialog`) im Feature-Code, sondern `App*`-Komponenten aus `lib/core/design/widgets/`.
+7. **Texte.** Alle UI-Texte in `lib/core/constants/app_strings.dart`, mit echten Umlauten. Keine hartcodierten Strings in Widgets.
+8. **Daten.** Geld als `int` in Cent, Anzeige mit `AppFormats.currencyFromCents`. Datum mit `AppFormats.date`. Aktionen mit Protokoll brauchen die `userId` aus `AppScope.of(context).currentUser`.
+9. **Code-Stil.** Bezeichner Englisch. Keine Kommentare, keine Emojis im Code. Explizite Typen wie im bestehenden Code. Lint-Regeln aus `analysis_options.yaml`.
+10. **Kleine Änderungen.** Nur Dateien ändern, die die Aufgabe betrifft.
 
 ## STOP: erst fragen, nicht selbst entscheiden
 
 - neue Dependency in `pubspec.yaml`
 - Änderungen an `tables.dart` (Schema), `schemaVersion`, Migrationen
 - Änderungen an Design-Tokens oder neue Komponentenarten
-- Berechnung der Dashboard-Kennzahlen und Backup-Format (noch offen, `REQUIREMENTS_REVIEW.md` R2/R3)
+- Änderungen an Kennzahl-Definitionen oder Backup-Format (ADR-005)
 - Änderungen an ADRs, Branch-Strategie, CI
 
 Vorgehen: Vorschlag mit Begründung formulieren und nach Zustimmung als ADR in `docs/decisions/ADR-NNN-<thema>.md` dokumentieren.

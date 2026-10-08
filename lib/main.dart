@@ -20,6 +20,7 @@ class AnhaengerApp extends StatelessWidget {
       title: AppStrings.appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.build(),
+      locale: const Locale('de'),
       home: const AppRoot(),
     );
   }

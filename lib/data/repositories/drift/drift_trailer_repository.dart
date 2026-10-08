@@ -171,6 +171,20 @@ class DriftTrailerRepository implements TrailerRepository {
   }
 
   @override
+  Future<void> restore(int id) {
+    return _db.transaction(() async {
+      await _requireRow(id);
+      await _write(
+        id,
+        TrailersCompanion(
+          archivedAt: const Value<DateTime?>(null),
+          updatedAt: Value<DateTime>(DateTime.now()),
+        ),
+      );
+    });
+  }
+
+  @override
   Stream<List<TrailerStatusChange>> watchStatusHistory(int trailerId) {
     final JoinedSelectStatement<HasResultSet, dynamic> select =
         _db.select(_db.trailerStatusChanges).join(<Join>[

@@ -5,6 +5,7 @@ import 'package:anhaenger_verwaltungssystem/core/database/app_database.dart';
 import 'package:anhaenger_verwaltungssystem/core/database/app_directories.dart';
 import 'package:anhaenger_verwaltungssystem/core/design/app_theme.dart';
 import 'package:anhaenger_verwaltungssystem/core/design/widgets/app_status_badge.dart';
+import 'package:anhaenger_verwaltungssystem/core/formatting/app_formats.dart';
 import 'package:anhaenger_verwaltungssystem/data/models/app_user.dart';
 import 'package:anhaenger_verwaltungssystem/data/models/enums.dart';
 import 'package:anhaenger_verwaltungssystem/shared/app_dependencies.dart';
@@ -19,18 +20,47 @@ Widget wrap(Widget child) {
   return FluentApp(theme: AppTheme.build(), home: child);
 }
 
+AppDependencies createDependencies() {
+  return AppDependencies.create(
+    createTestDatabase(),
+    AppDirectories(Directory.systemTemp),
+  );
+}
+
+void useDesktopSize(WidgetTester tester) {
+  tester.view.physicalSize = const Size(1400, 900);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
+Future<void> pumpFrames(WidgetTester tester) async {
+  for (int i = 0; i < 10; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+}
+
 void main() {
+  setUpAll(AppFormats.initialize);
+
   testWidgets('Navigation zeigt alle Bereiche und den Benutzer', (
     WidgetTester tester,
   ) async {
+    useDesktopSize(tester);
+    final AppDependencies dependencies = createDependencies();
+
     await tester.pumpWidget(
       wrap(
-        AppShell(
-          user: const AppUser(id: 1, name: 'Anna', isActive: true),
-          onSwitchUser: () {},
+        AppScope(
+          dependencies: dependencies,
+          child: AppShell(
+            user: const AppUser(id: 1, name: 'Anna', isActive: true),
+            onSwitchUser: () {},
+          ),
         ),
       ),
     );
+    await pumpFrames(tester);
 
     for (final String label in <String>[
       AppStrings.navDashboard,
@@ -43,6 +73,9 @@ void main() {
       expect(find.text(label), findsWidgets);
     }
     expect(find.text('${AppStrings.currentUser} Anna'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.runAsync(() => dependencies.dispose());
   });
 
   testWidgets('Status-Badges zeigen die deutschen Bezeichnungen', (
@@ -66,17 +99,13 @@ void main() {
   });
 
   testWidgets('Start zeigt die Benutzerauswahl', (WidgetTester tester) async {
-    final AppDependencies dependencies = AppDependencies.create(
-      createTestDatabase(),
-      AppDirectories(Directory.systemTemp),
-    );
+    useDesktopSize(tester);
+    final AppDependencies dependencies = createDependencies();
 
     await tester.pumpWidget(
       wrap(AppRoot(openDependencies: () async => dependencies)),
     );
-    for (int i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 50));
-    }
+    await pumpFrames(tester);
 
     expect(find.text('${AppStrings.startupSelectUser} *'), findsOneWidget);
     expect(find.text(AppStrings.actionStart), findsOneWidget);
@@ -86,7 +115,7 @@ void main() {
       name: AppDatabase.defaultUserName,
       isActive: true,
     );
-    await tester.pump();
+    await pumpFrames(tester);
 
     expect(find.text(AppStrings.navTrailers), findsWidgets);
 

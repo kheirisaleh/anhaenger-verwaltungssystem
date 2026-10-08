@@ -13,4 +13,6 @@ abstract interface class CustomerRepository {
   Future<void> update(int id, CustomerDraft draft);
 
   Future<void> archive(int id);
+
+  Future<void> restore(int id);
 }

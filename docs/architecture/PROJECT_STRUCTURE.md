@@ -42,7 +42,8 @@ test/
 
 - `features/` darf `core/`, `data/` und `shared/app_dependencies.dart` nutzen.
 - `core/` importiert kein Feature und nichts aus `shared/`.
-- Ein Feature importiert kein anderes Feature. Gemeinsame Teile wandern nach `core/` oder `shared/`.
+- Ein Feature importiert keine Controller eines anderen Features. Wiederverwendbare Tabellen (`DamageTable`, `ContractTable`) aus `presentation/` dürfen eingebettet werden (ADR-005). Gemeinsame Teile wandern nach `core/` oder `shared/`.
+- Dialoge und Detailseiten werden mit `showScopedDialog` und `pushScopedPage` geöffnet, nie direkt mit `showDialog` oder `Navigator.push`, wenn sie `AppScope` brauchen.
 - Nur `shared/app_dependencies.dart` und Tests importieren `data/repositories/drift/`.
 - Jede Oberfläche nutzt die Komponenten aus `core/design/widgets/`.
 

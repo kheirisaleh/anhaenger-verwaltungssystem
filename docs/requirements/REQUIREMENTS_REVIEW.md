@@ -23,7 +23,7 @@ Kritisch für den Projektfortschritt sind vor allem:
 
 Diese Punkte sollten im Datenbank-Task (Task 1) und im Wireframe-Task (Task 2) geklärt werden.
 
-> **Update 08.10.2026:** K1, K2, K3, K5 sowie W2–W5 und R1 sind entschieden (ADR-002, `DATABASE_MODEL.md`). Alle Befunde aus Abschnitt 5 sind behoben. Offen bleiben K4/R2 (Kennzahlen), R3 (Backup) und W1 (Hinweis im ADR-001).
+> **Update 08.10.2026:** K1, K2, K3, K5 sowie W2–W5 und R1 sind entschieden (ADR-002, `DATABASE_MODEL.md`). Alle Befunde aus Abschnitt 5 sind behoben. K4/R2 (Kennzahlen) und R3 (Backup) sind in ADR-005 festgelegt. Offen bleibt nur W1 (Hinweis im ADR-001).
 
 ---
 

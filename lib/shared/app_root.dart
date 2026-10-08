@@ -31,41 +31,55 @@ class _AppRootState extends State<AppRoot> {
     setState(() => _dependencies = widget.openDependencies());
   }
 
+  void _restart(Future<void> Function() whileClosed) {
+    final Future<AppDependencies> previous = _dependencies;
+    final Future<AppDependencies> next = _reopen(previous, whileClosed);
+    setState(() => _dependencies = next);
+  }
+
+  Future<AppDependencies> _reopen(
+    Future<AppDependencies> previous,
+    Future<void> Function() whileClosed,
+  ) async {
+    await WidgetsBinding.instance.endOfFrame;
+    final AppDependencies old = await previous;
+    await old.dispose();
+    await whileClosed();
+    return widget.openDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<AppDependencies>(
       future: _dependencies,
-      builder:
-          (
-            BuildContext context,
-            AsyncSnapshot<AppDependencies> snapshot,
-          ) {
-            if (snapshot.hasError) {
-              return AppErrorState(
-                message: AppStrings.startupError,
-                onRetry: _retry,
+      builder: (BuildContext context, AsyncSnapshot<AppDependencies> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const AppLoadingState();
+        }
+        final AppDependencies? dependencies = snapshot.data;
+        if (snapshot.hasError || dependencies == null) {
+          return AppErrorState(
+            message: AppStrings.startupError,
+            onRetry: _retry,
+          );
+        }
+        return AppScope(
+          dependencies: dependencies,
+          restart: _restart,
+          child: ValueListenableBuilder<AppUser?>(
+            valueListenable: dependencies.currentUser,
+            builder: (BuildContext context, AppUser? user, Widget? child) {
+              if (user == null) {
+                return const UserSelectionPage();
+              }
+              return AppShell(
+                user: user,
+                onSwitchUser: () => dependencies.currentUser.value = null,
               );
-            }
-            final AppDependencies? dependencies = snapshot.data;
-            if (dependencies == null) {
-              return const AppLoadingState();
-            }
-            return AppScope(
-              dependencies: dependencies,
-              child: ValueListenableBuilder<AppUser?>(
-                valueListenable: dependencies.currentUser,
-                builder: (BuildContext context, AppUser? user, Widget? child) {
-                  if (user == null) {
-                    return const UserSelectionPage();
-                  }
-                  return AppShell(
-                    user: user,
-                    onSwitchUser: () => dependencies.currentUser.value = null,
-                  );
-                },
-              ),
-            );
-          },
+            },
+          ),
+        );
+      },
     );
   }
 }
