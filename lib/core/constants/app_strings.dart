@@ -206,13 +206,11 @@ abstract final class AppStrings {
   static const String contractHandOver = 'Übergeben';
   static const String contractHandOverConfirm =
       'Den Anhänger jetzt an den Kunden übergeben? Der Anhänger wird auf „Vermietet“ gesetzt.';
-  static const String contractHandedOver =
-      'Der Anhänger wurde übergeben.';
+  static const String contractHandedOver = 'Der Anhänger wurde übergeben.';
   static const String contractReturn = 'Rücknahme';
   static const String contractReturnConfirm =
       'Den Anhänger jetzt zurücknehmen? Der Vertrag wird abgeschlossen und der Anhänger ist wieder verfügbar.';
-  static const String contractReturned =
-      'Der Anhänger wurde zurückgenommen.';
+  static const String contractReturned = 'Der Anhänger wurde zurückgenommen.';
   static const String contractCancel = 'Stornieren';
   static const String contractCancelConfirm =
       'Möchten Sie diesen Vertrag wirklich stornieren?';

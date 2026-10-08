@@ -49,12 +49,54 @@ void main() {
     trailer(2, TrailerStatus.available, type: 'Pkw-Anhänger'),
   ];
   final List<RentalContract> contracts = <RentalContract>[
-    contract(1, 1, DateTime(2026, 10, 1), const Duration(days: 2), ContractStatus.completed, 10000),
-    contract(2, 1, DateTime(2026, 10, 14), const Duration(days: 4), ContractStatus.active, 5000),
-    contract(3, 2, DateTime(2026, 10, 20), const Duration(days: 1), ContractStatus.planned, 3000),
-    contract(4, 2, DateTime(2026, 10, 22), const Duration(days: 1), ContractStatus.cancelled, 9999),
-    contract(5, 2, DateTime(2025, 3, 1), const Duration(days: 1), ContractStatus.completed, 7000),
-    contract(6, 1, DateTime(2026, 2, 1), const Duration(days: 4), ContractStatus.completed, 2000),
+    contract(
+      1,
+      1,
+      DateTime(2026, 10, 1),
+      const Duration(days: 2),
+      ContractStatus.completed,
+      10000,
+    ),
+    contract(
+      2,
+      1,
+      DateTime(2026, 10, 14),
+      const Duration(days: 4),
+      ContractStatus.active,
+      5000,
+    ),
+    contract(
+      3,
+      2,
+      DateTime(2026, 10, 20),
+      const Duration(days: 1),
+      ContractStatus.planned,
+      3000,
+    ),
+    contract(
+      4,
+      2,
+      DateTime(2026, 10, 22),
+      const Duration(days: 1),
+      ContractStatus.cancelled,
+      9999,
+    ),
+    contract(
+      5,
+      2,
+      DateTime(2025, 3, 1),
+      const Duration(days: 1),
+      ContractStatus.completed,
+      7000,
+    ),
+    contract(
+      6,
+      1,
+      DateTime(2026, 2, 1),
+      const Duration(days: 4),
+      ContractStatus.completed,
+      2000,
+    ),
   ];
 
   final DashboardMetrics metrics = DashboardMetrics.compute(

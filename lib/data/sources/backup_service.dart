@@ -19,7 +19,9 @@ class BackupService {
       'yyyy-MM-dd_HH-mm-ss',
       'en_US',
     ).format(DateTime.now());
-    final Directory target = Directory(p.join(parent.path, '$folderPrefix$stamp'));
+    final Directory target = Directory(
+      p.join(parent.path, '$folderPrefix$stamp'),
+    );
     final File databaseCopy = _databaseFileIn(target);
     await databaseCopy.parent.create(recursive: true);
     final String escaped = databaseCopy.path.replaceAll("'", "''");

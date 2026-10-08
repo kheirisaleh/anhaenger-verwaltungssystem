@@ -284,14 +284,16 @@ class SampleDataSeeder {
       DamageRecordDraft(
         trailerId: fleet[2].id,
         eventDate: now.subtract(const Duration(days: 75)),
-        description: 'Jemand hat „Hupen, wenn du mich magst“ auf die Bordwand gemalt.',
+        description:
+            'Jemand hat „Hupen, wenn du mich magst“ auf die Bordwand gemalt.',
         damageType: DamageType.vandalism,
         causedBy: DamageCause.unknown,
       ),
       DamageRecordDraft(
         trailerId: fleet[3].id,
         eventDate: now.subtract(const Duration(days: 150)),
-        description: 'Eine Ziege hat die Plane angeknabbert. Die Ziege ist wohlauf.',
+        description:
+            'Eine Ziege hat die Plane angeknabbert. Die Ziege ist wohlauf.',
         damageType: DamageType.other,
         causedBy: DamageCause.unknown,
         costCents: 3550,
@@ -320,7 +322,16 @@ class SampleDataSeeder {
   }
 
   int _priceFor(int fleetIndex, int days) {
-    const List<int> dailyCents = <int>[3900, 6900, 4500, 4900, 8900, 3500, 4500, 9900];
+    const List<int> dailyCents = <int>[
+      3900,
+      6900,
+      4500,
+      4900,
+      8900,
+      3500,
+      4500,
+      9900,
+    ];
     return dailyCents[fleetIndex % dailyCents.length] * days;
   }
 

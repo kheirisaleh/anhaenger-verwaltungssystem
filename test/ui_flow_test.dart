@@ -23,7 +23,10 @@ Future<void> openPane(WidgetTester tester, String label) async {
   await settle(tester);
 }
 
-Future<void> openAndCancelDialog(WidgetTester tester, String buttonLabel) async {
+Future<void> openAndCancelDialog(
+  WidgetTester tester,
+  String buttonLabel,
+) async {
   await tester.tap(find.text(buttonLabel).first);
   await settle(tester);
   expect(find.text(AppStrings.actionCancel), findsWidgets);
@@ -91,7 +94,9 @@ void main() {
     await tester.tap(find.text('Rainer Zufall'));
     await settle(tester);
     expect(find.text(AppStrings.sectionContactData), findsOneWidget);
-    Navigator.of(tester.element(find.text(AppStrings.sectionContactData))).pop();
+    Navigator.of(
+      tester.element(find.text(AppStrings.sectionContactData)),
+    ).pop();
     await settle(tester);
 
     await openPane(tester, AppStrings.navContracts);

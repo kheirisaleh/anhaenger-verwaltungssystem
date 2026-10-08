@@ -73,7 +73,10 @@ class ContractsPage extends StatelessWidget {
         ],
     ];
     try {
-      final File? file = await FileDialogs.saveCsv(AppStrings.exportContractsFile, rows);
+      final File? file = await FileDialogs.saveCsv(
+        AppStrings.exportContractsFile,
+        rows,
+      );
       if (file != null && context.mounted) {
         AppMessages.success(context, AppStrings.exportDone);
       }

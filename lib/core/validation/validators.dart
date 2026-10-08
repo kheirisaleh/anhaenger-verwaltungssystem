@@ -44,11 +44,11 @@ abstract final class Validators {
     if (!_money.hasMatch(withoutThousands)) {
       return null;
     }
-    final List<String> parts = withoutThousands
-        .replaceAll(',', '.')
-        .split('.');
+    final List<String> parts = withoutThousands.replaceAll(',', '.').split('.');
     final int euros = int.parse(parts[0]);
-    final int cents = parts.length == 1 ? 0 : int.parse(parts[1].padRight(2, '0'));
+    final int cents = parts.length == 1
+        ? 0
+        : int.parse(parts[1].padRight(2, '0'));
     return euros * 100 + cents;
   }
 

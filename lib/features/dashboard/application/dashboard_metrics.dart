@@ -67,9 +67,7 @@ class DashboardMetrics {
         status: fleet.where((Trailer t) => t.status == status).length,
     };
 
-    final List<RentalContract> realized = contracts
-        .where(isRealized)
-        .toList();
+    final List<RentalContract> realized = contracts.where(isRealized).toList();
 
     final List<MonthFigure> months = <MonthFigure>[
       for (int offset = 11; offset >= 0; offset--)

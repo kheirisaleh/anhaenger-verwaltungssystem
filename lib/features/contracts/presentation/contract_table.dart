@@ -154,9 +154,8 @@ class _ContractTableState extends State<ContractTable> {
     return AppDataTable<RentalContract>(
       rows: contracts,
       shrinkWrap: widget.shrinkWrap,
-      onRowTap: (RentalContract contract) => contract.isEditable
-          ? _openForm(context, contract: contract)
-          : null,
+      onRowTap: (RentalContract contract) =>
+          contract.isEditable ? _openForm(context, contract: contract) : null,
       actionsWidth: 140,
       columns: <AppDataColumn<RentalContract>>[
         AppDataColumn<RentalContract>(

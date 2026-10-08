@@ -27,7 +27,10 @@ void main() {
   test('Koordinaten', () {
     expect(Validators.coordinate('', limit: 90), isNull);
     expect(Validators.coordinate('51,05', limit: 90), isNull);
-    expect(Validators.coordinate('91', limit: 90), AppStrings.validationCoordinate);
+    expect(
+      Validators.coordinate('91', limit: 90),
+      AppStrings.validationCoordinate,
+    );
     expect(Validators.parseDecimal('13,74'), 13.74);
   });
 

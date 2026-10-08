@@ -211,7 +211,9 @@ class _DamageTableState extends State<DamageTable> {
           cellBuilder: (DamageRecord d) {
             final int? cost = d.costCents;
             return AppTableText(
-              cost == null ? AppStrings.none : AppFormats.currencyFromCents(cost),
+              cost == null
+                  ? AppStrings.none
+                  : AppFormats.currencyFromCents(cost),
             );
           },
         ),

@@ -236,7 +236,8 @@ class _DashboardPageState extends State<DashboardPage> {
           spacing: gap,
           runSpacing: gap,
           children: <Widget>[
-            for (final Widget tile in tiles) SizedBox(width: width, child: tile),
+            for (final Widget tile in tiles)
+              SizedBox(width: width, child: tile),
           ],
         );
       },
@@ -251,7 +252,11 @@ class _DashboardPageState extends State<DashboardPage> {
     final List<List<String>> rows = <List<String>>[
       <String>[AppStrings.dashboardReport, AppFormats.date(DateTime.now())],
       <String>[],
-      <String>[AppStrings.dashboardMonth, AppStrings.rentals, AppStrings.dashboardRevenue],
+      <String>[
+        AppStrings.dashboardMonth,
+        AppStrings.rentals,
+        AppStrings.dashboardRevenue,
+      ],
       for (final MonthFigure month in metrics.months)
         <String>[
           AppFormats.month(month.month),

@@ -93,7 +93,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   AppDataColumn<AppUser>(
                     label: AppStrings.fieldStatus,
                     cellBuilder: (AppUser u) => AppTableText(
-                      u.isActive ? AppStrings.userActive : AppStrings.userInactive,
+                      u.isActive
+                          ? AppStrings.userActive
+                          : AppStrings.userInactive,
                       isMuted: !u.isActive,
                     ),
                   ),
@@ -285,7 +287,8 @@ class _SettingsPageState extends State<SettingsPage> {
         title: AppStrings.actionRename,
         label: AppStrings.fieldName,
         initialValue: type.name,
-        onSave: (String name) => dependencies.trailerTypes.rename(type.id, name),
+        onSave: (String name) =>
+            dependencies.trailerTypes.rename(type.id, name),
       ),
     );
     if (context.mounted) {

@@ -87,8 +87,7 @@ class _DamageFormDialogState extends State<DamageFormDialog> {
                   )
                   .toList()
                 ..sort(
-                  (Customer a, Customer b) =>
-                      a.lastName.compareTo(b.lastName),
+                  (Customer a, Customer b) => a.lastName.compareTo(b.lastName),
                 );
           return AppForm(
             errorMessage: _error,

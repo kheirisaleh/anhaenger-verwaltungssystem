@@ -57,7 +57,9 @@ void main() {
     expect(customers, hasLength(8));
     expect(damages, hasLength(6));
     expect(
-      contracts.where((RentalContract c) => c.status == ContractStatus.completed),
+      contracts.where(
+        (RentalContract c) => c.status == ContractStatus.completed,
+      ),
       isNotEmpty,
     );
     expect(
@@ -69,7 +71,9 @@ void main() {
       hasLength(3),
     );
     expect(
-      contracts.where((RentalContract c) => c.status == ContractStatus.cancelled),
+      contracts.where(
+        (RentalContract c) => c.status == ContractStatus.cancelled,
+      ),
       hasLength(1),
     );
 
@@ -123,15 +127,23 @@ void main() {
     final Directory backup = await dependencies.backup.export(exportParent);
 
     expect(BackupService.isBackupFolder(backup), isTrue);
-    expect(File('${backup.path}/images/trailers/1/foto.jpg').existsSync(), isTrue);
+    expect(
+      File('${backup.path}/images/trailers/1/foto.jpg').existsSync(),
+      isTrue,
+    );
 
     final AppDirectories target = AppDirectories(
       await Directory('${root.path}/restored').create(),
     );
     await BackupService.restoreFiles(backup, target);
 
-    expect(File('${target.imagesDirectory.path}/trailers/1/foto.jpg').existsSync(), isTrue);
-    final AppDatabase restored = AppDatabase(NativeDatabase(target.databaseFile));
+    expect(
+      File('${target.imagesDirectory.path}/trailers/1/foto.jpg').existsSync(),
+      isTrue,
+    );
+    final AppDatabase restored = AppDatabase(
+      NativeDatabase(target.databaseFile),
+    );
     final AppDependencies restoredDependencies = AppDependencies.create(
       restored,
       target,

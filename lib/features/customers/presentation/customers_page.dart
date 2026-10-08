@@ -115,7 +115,9 @@ class _CustomersPageState extends State<CustomersPage> {
           label: AppStrings.fieldName,
           flex: 2,
           cellBuilder: (Customer c) => AppTableText(
-            c.isArchived ? '${c.fullName} (${AppStrings.archived})' : c.fullName,
+            c.isArchived
+                ? '${c.fullName} (${AppStrings.archived})'
+                : c.fullName,
           ),
         ),
         AppDataColumn<Customer>(
