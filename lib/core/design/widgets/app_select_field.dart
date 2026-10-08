@@ -41,7 +41,6 @@ class AppSelectField<T> extends StatelessWidget {
         Text(isRequired ? '$label *' : label, style: AppText.label),
         const SizedBox(height: AppSpacing.xs),
         SizedBox(
-          height: AppSizes.controlHeight,
           width: double.infinity,
           child: ComboBox<T>(
             isExpanded: true,

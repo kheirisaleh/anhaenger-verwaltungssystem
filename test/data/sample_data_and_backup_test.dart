@@ -11,6 +11,7 @@ import 'package:anhaenger_verwaltungssystem/data/repositories/trailer_repository
 import 'package:anhaenger_verwaltungssystem/data/sources/backup_service.dart';
 import 'package:anhaenger_verwaltungssystem/data/sources/sample_data_seeder.dart';
 import 'package:anhaenger_verwaltungssystem/shared/app_dependencies.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,6 +20,8 @@ import '../helpers/test_database.dart';
 void main() {
   late Directory root;
   late AppDependencies dependencies;
+
+  setUpAll(() => driftRuntimeOptions.dontWarnAboutMultipleDatabases = true);
 
   setUp(() async {
     root = await Directory.systemTemp.createTemp('anhaenger_seed_');
