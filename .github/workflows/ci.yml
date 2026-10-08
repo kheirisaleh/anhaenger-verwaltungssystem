@@ -66,6 +66,38 @@ jobs:
             exit 1
           }
 
+  macos:
+    name: macOS-Build
+    needs: check
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Abhängigkeiten
+        run: flutter pub get
+
+      - name: Code generieren (Drift)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build
+        run: |
+          set -o pipefail
+          flutter build macos --release 2>&1 | tee build_macos.txt || {
+            .github/scripts/annotate.sh error "flutter build macos" build_macos.txt
+            exit 1
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anhaenger-verwaltung-macos
+          path: build/macos/Build/Products/Release/
+          retention-days: 14
+
   windows:
     name: Windows-Build
     needs: check
