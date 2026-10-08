@@ -1,7 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../core/constants/app_strings.dart';
+import '../../../core/design/app_icons.dart';
 import '../../../core/design/app_typography.dart';
+import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_date_time_field.dart';
 import '../../../core/design/widgets/app_dialog.dart';
 import '../../../core/design/widgets/app_form.dart';
@@ -17,6 +19,8 @@ import '../../../data/repositories/repository_exception.dart';
 import '../../../shared/app_dependencies.dart';
 import '../../../shared/lookup_builder.dart';
 import '../../../shared/photo_gallery.dart';
+import '../../../shared/scoped_navigation.dart';
+import '../../customers/presentation/customer_form_dialog.dart';
 
 class DamageFormDialog extends StatefulWidget {
   const DamageFormDialog({super.key, this.damage, this.trailerId});
@@ -124,6 +128,8 @@ class _DamageFormDialogState extends State<DamageFormDialog> {
                     label: AppStrings.fieldCostEuro,
                     controller: _cost,
                     placeholder: AppStrings.placeholderMoney,
+                    suffixText: AppStrings.currencyEuro,
+                    onSubmitted: (_) => _save(),
                     errorText: _costError,
                   ),
                 ],
@@ -183,11 +189,17 @@ class _DamageFormDialogState extends State<DamageFormDialog> {
                       ),
                   ],
                   onChanged: (int? id) => setState(() => _customerId = id),
+                  action: AppButton(
+                    label: AppStrings.actionNew,
+                    icon: AppIcons.add,
+                    onPressed: _createCustomer,
+                  ),
                 ),
               AppTextField(
                 label: AppStrings.fieldDescription,
                 controller: _description,
                 isRequired: true,
+                autofocus: widget.trailerId != null,
                 maxLines: 3,
                 errorText: _descriptionError,
               ),
@@ -207,7 +219,23 @@ class _DamageFormDialogState extends State<DamageFormDialog> {
     );
   }
 
+  Future<void> _createCustomer() async {
+    final Object? created = await showScopedDialog<Object>(
+      context,
+      (BuildContext context) => const CustomerFormDialog(),
+    );
+    if (created is Customer && mounted) {
+      setState(() {
+        _customerId = created.id;
+        _customerError = null;
+      });
+    }
+  }
+
   Future<void> _save() async {
+    if (_isSaving) {
+      return;
+    }
     final int? trailerId = _trailerId;
     final int? customerId = _customerId;
     final bool needsCustomer = _causedBy == DamageCause.customer;

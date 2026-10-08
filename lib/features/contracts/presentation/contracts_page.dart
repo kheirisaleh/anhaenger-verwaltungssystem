@@ -78,7 +78,10 @@ class ContractsPage extends StatelessWidget {
         rows,
       );
       if (file != null && context.mounted) {
-        AppMessages.success(context, AppStrings.exportDone);
+        AppMessages.success(
+          context,
+          '${AppStrings.exportDone} ${file.path}',
+        );
       }
     } on FileSystemException {
       if (context.mounted) {

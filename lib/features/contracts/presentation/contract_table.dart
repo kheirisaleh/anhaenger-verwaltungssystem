@@ -1,14 +1,16 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../core/constants/app_strings.dart';
+import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_icons.dart';
 import '../../../core/design/app_spacing.dart';
 import '../../../core/design/app_typography.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_data_table.dart';
 import '../../../core/design/widgets/app_dialog.dart';
+import '../../../core/design/widgets/app_filter_chips.dart';
 import '../../../core/design/widgets/app_icon_button.dart';
-import '../../../core/design/widgets/app_select_field.dart';
+import '../../../core/design/widgets/app_search_field.dart';
 import '../../../core/design/widgets/app_state_views.dart';
 import '../../../core/design/widgets/app_status_badge.dart';
 import '../../../core/formatting/app_formats.dart';
@@ -61,106 +63,123 @@ class _ContractTableState extends State<ContractTable> {
     final ContractListController controller = _controller!;
     return ListenableBuilder(
       listenable: controller,
-      builder: (BuildContext context, Widget? child) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
-        children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Expanded(
-                child: AppSelectField<ContractStatus?>(
-                  label: AppStrings.fieldStatus,
-                  value: controller.status,
-                  placeholder: AppStrings.filterAll,
-                  options: <AppSelectOption<ContractStatus?>>[
-                    const AppSelectOption<ContractStatus?>(
-                      value: null,
-                      label: AppStrings.filterAll,
-                    ),
-                    for (final ContractStatus status in ContractStatus.values)
-                      AppSelectOption<ContractStatus?>(
-                        value: status,
-                        label: status.label,
-                      ),
-                  ],
-                  onChanged: controller.setStatus,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              AppButton(
-                label: AppStrings.contractCreate,
-                icon: AppIcons.add,
-                variant: widget.shrinkWrap
-                    ? AppButtonVariant.secondary
-                    : AppButtonVariant.primary,
-                onPressed: () => _openForm(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (widget.shrinkWrap)
-            _buildList(context, controller)
-          else
-            Expanded(child: _buildList(context, controller)),
-        ],
+      builder: (BuildContext context, Widget? child) => LookupBuilder(
+        builder: (BuildContext context, Lookups lookups) =>
+            StreamBuilder<List<RentalContract>>(
+              stream: controller.contracts,
+              builder:
+                  (
+                    BuildContext context,
+                    AsyncSnapshot<List<RentalContract>> snapshot,
+                  ) {
+                    if (snapshot.hasError) {
+                      return const AppErrorState();
+                    }
+                    final List<RentalContract>? all = snapshot.data;
+                    if (all == null) {
+                      return const SizedBox(
+                        height: 120,
+                        child: AppLoadingState(),
+                      );
+                    }
+                    return _buildContent(context, controller, lookups, all);
+                  },
+            ),
       ),
     );
   }
 
-  Widget _buildList(BuildContext context, ContractListController controller) {
-    return LookupBuilder(
-      builder: (BuildContext context, Lookups lookups) =>
-          StreamBuilder<List<RentalContract>>(
-            stream: controller.contracts,
-            builder:
-                (
-                  BuildContext context,
-                  AsyncSnapshot<List<RentalContract>> snapshot,
-                ) {
-                  if (snapshot.hasError) {
-                    return const AppErrorState();
-                  }
-                  final List<RentalContract>? contracts = snapshot.data;
-                  if (contracts == null) {
-                    return const SizedBox(
-                      height: 120,
-                      child: AppLoadingState(),
-                    );
-                  }
-                  if (contracts.isEmpty) {
-                    return SizedBox(
-                      height: 200,
-                      child: AppEmptyState(
-                        title: AppStrings.navContracts,
-                        description: controller.hasFilter
-                            ? AppStrings.emptySearch
-                            : AppStrings.emptyContracts,
-                        icon: AppIcons.contracts,
-                      ),
-                    );
-                  }
-                  return _buildTable(context, contracts, lookups);
-                },
-          ),
+  Widget _buildContent(
+    BuildContext context,
+    ContractListController controller,
+    Lookups lookups,
+    List<RentalContract> all,
+  ) {
+    final List<RentalContract> searched = controller.matchingSearch(
+      all,
+      (RentalContract c) =>
+          '${lookups.customerName(c.customerId)} '
+          '${lookups.trailerName(c.trailerId)}',
+    );
+    final List<RentalContract> visible = controller.visible(searched);
+    final Widget body = visible.isEmpty
+        ? SizedBox(
+            height: 200,
+            child: AppEmptyState(
+              title: AppStrings.navContracts,
+              description: controller.hasFilter
+                  ? AppStrings.emptySearch
+                  : AppStrings.emptyContracts,
+              icon: AppIcons.contracts,
+              actionLabel: controller.hasFilter
+                  ? null
+                  : AppStrings.contractCreate,
+              onAction: () => _openForm(context),
+            ),
+          )
+        : _buildTable(context, controller, visible, lookups);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: AppSearchField(
+                placeholder: AppStrings.contractSearch,
+                onChanged: controller.setSearch,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            AppButton(
+              label: AppStrings.contractCreate,
+              icon: AppIcons.add,
+              variant: widget.shrinkWrap
+                  ? AppButtonVariant.secondary
+                  : AppButtonVariant.primary,
+              onPressed: () => _openForm(context),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AppFilterChips<ContractFilter>(
+          selected: controller.filter,
+          onSelected: controller.setFilter,
+          chips: <AppFilterChip<ContractFilter>>[
+            for (final ContractFilter filter in ContractFilter.values)
+              AppFilterChip<ContractFilter>(
+                value: filter,
+                label: _filterLabel(filter),
+                count: controller.count(searched, filter),
+                color: _filterColor(filter),
+              ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (widget.shrinkWrap) body else Expanded(child: body),
+      ],
     );
   }
 
   Widget _buildTable(
     BuildContext context,
+    ContractListController controller,
     List<RentalContract> contracts,
     Lookups lookups,
   ) {
+    final DateTime now = controller.now();
     return AppDataTable<RentalContract>(
       rows: contracts,
       shrinkWrap: widget.shrinkWrap,
-      onRowTap: (RentalContract contract) =>
-          contract.isEditable ? _openForm(context, contract: contract) : null,
+      onRowTap: (RentalContract contract) => contract.isEditable
+          ? _openForm(context, contract: contract)
+          : null,
       actionsWidth: 140,
       columns: <AppDataColumn<RentalContract>>[
         AppDataColumn<RentalContract>(
           label: AppStrings.fieldNumber,
           cellBuilder: (RentalContract c) => AppTableText('#${c.id}'),
+          sortValue: (RentalContract c) => c.id,
         ),
         if (widget.customerId == null)
           AppDataColumn<RentalContract>(
@@ -168,6 +187,8 @@ class _ContractTableState extends State<ContractTable> {
             flex: 2,
             cellBuilder: (RentalContract c) =>
                 AppTableText(lookups.customerName(c.customerId)),
+            sortValue: (RentalContract c) =>
+                lookups.customerName(c.customerId),
           ),
         if (widget.trailerId == null)
           AppDataColumn<RentalContract>(
@@ -175,26 +196,25 @@ class _ContractTableState extends State<ContractTable> {
             flex: 2,
             cellBuilder: (RentalContract c) =>
                 AppTableText(lookups.trailerName(c.trailerId)),
+            sortValue: (RentalContract c) => lookups.trailerName(c.trailerId),
           ),
         AppDataColumn<RentalContract>(
           label: AppStrings.fieldPeriod,
           flex: 3,
-          cellBuilder: (RentalContract c) => Text(
-            '${AppFormats.dateTime(c.startAt)} –\n'
-            '${AppFormats.dateTime(c.endAt)}',
-            style: AppText.caption,
-            maxLines: 2,
-          ),
+          cellBuilder: (RentalContract c) => _periodCell(c, now),
+          sortValue: (RentalContract c) => c.startAt.millisecondsSinceEpoch,
         ),
         AppDataColumn<RentalContract>(
           label: AppStrings.fieldPrice,
           isNumeric: true,
           cellBuilder: (RentalContract c) =>
               AppTableText(AppFormats.currencyFromCents(c.priceCents)),
+          sortValue: (RentalContract c) => c.priceCents,
         ),
         AppDataColumn<RentalContract>(
           label: AppStrings.fieldStatus,
           cellBuilder: (RentalContract c) => AppStatusBadge.contract(c.status),
+          sortValue: (RentalContract c) => c.status.index,
         ),
       ],
       actionsBuilder: (RentalContract contract) => <Widget>[
@@ -226,11 +246,57 @@ class _ContractTableState extends State<ContractTable> {
     );
   }
 
+  Widget _periodCell(RentalContract contract, DateTime now) {
+    final bool overdue = contract.isOverdue(now);
+    final bool due = !overdue && contract.needsAttention(now);
+    final Color color = overdue
+        ? AppColors.danger
+        : due
+        ? AppColors.warning
+        : AppColors.textSecondary;
+    final String prefix = overdue
+        ? '${AppStrings.contractOverdue} · '
+        : due
+        ? '${AppStrings.contractDueToday} · '
+        : '';
+    return Text(
+      '$prefix${AppFormats.dateTime(contract.startAt)} –\n'
+      '${AppFormats.dateTime(contract.endAt)}',
+      style: AppText.caption.copyWith(color: color),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  String _filterLabel(ContractFilter filter) {
+    return switch (filter) {
+      ContractFilter.all => AppStrings.filterAll,
+      ContractFilter.attention => AppStrings.contractFilterAttention,
+      ContractFilter.overdue => AppStrings.contractOverdue,
+      ContractFilter.planned => AppStrings.contractStatusPlanned,
+      ContractFilter.active => AppStrings.contractStatusActive,
+      ContractFilter.completed => AppStrings.contractStatusCompleted,
+      ContractFilter.cancelled => AppStrings.contractStatusCancelled,
+    };
+  }
+
+  Color? _filterColor(ContractFilter filter) {
+    return switch (filter) {
+      ContractFilter.all => null,
+      ContractFilter.attention => AppColors.warning,
+      ContractFilter.overdue => AppColors.danger,
+      ContractFilter.planned => AppColors.statusPlanned,
+      ContractFilter.active => AppColors.statusRented,
+      ContractFilter.completed => AppColors.statusAvailable,
+      ContractFilter.cancelled => AppColors.statusBlocked,
+    };
+  }
+
   Future<void> _openForm(
     BuildContext context, {
     RentalContract? contract,
   }) async {
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => ContractFormDialog(
         contract: contract,

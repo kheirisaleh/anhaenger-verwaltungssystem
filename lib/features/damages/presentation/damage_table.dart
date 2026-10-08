@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/design/app_icons.dart';
 import '../../../core/design/app_spacing.dart';
+import '../../../core/design/app_typography.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_data_table.dart';
 import '../../../core/design/widgets/app_dialog.dart';
@@ -158,7 +159,25 @@ class _DamageTableState extends State<DamageTable> {
                       ),
                     );
                   }
-                  return _buildTable(context, damages, lookups);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: widget.shrinkWrap
+                        ? MainAxisSize.min
+                        : MainAxisSize.max,
+                    children: <Widget>[
+                      Text(
+                        '${damages.length} ${AppStrings.damagesCount}',
+                        style: AppText.caption,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      if (widget.shrinkWrap)
+                        _buildTable(context, damages, lookups)
+                      else
+                        Expanded(
+                          child: _buildTable(context, damages, lookups),
+                        ),
+                    ],
+                  );
                 },
           ),
     );
@@ -179,6 +198,7 @@ class _DamageTableState extends State<DamageTable> {
           label: AppStrings.fieldDate,
           cellBuilder: (DamageRecord d) =>
               AppTableText(AppFormats.date(d.eventDate)),
+          sortValue: (DamageRecord d) => d.eventDate.millisecondsSinceEpoch,
         ),
         if (widget.trailerId == null)
           AppDataColumn<DamageRecord>(
@@ -186,10 +206,12 @@ class _DamageTableState extends State<DamageTable> {
             flex: 2,
             cellBuilder: (DamageRecord d) =>
                 AppTableText(lookups.trailerName(d.trailerId)),
+            sortValue: (DamageRecord d) => lookups.trailerName(d.trailerId),
           ),
         AppDataColumn<DamageRecord>(
           label: AppStrings.fieldDamageType,
           cellBuilder: (DamageRecord d) => AppTableText(d.damageType.label),
+          sortValue: (DamageRecord d) => d.damageType.label,
         ),
         AppDataColumn<DamageRecord>(
           label: AppStrings.fieldCausedBy,
@@ -208,6 +230,7 @@ class _DamageTableState extends State<DamageTable> {
         AppDataColumn<DamageRecord>(
           label: AppStrings.fieldCost,
           isNumeric: true,
+          sortValue: (DamageRecord d) => d.costCents ?? -1,
           cellBuilder: (DamageRecord d) {
             final int? cost = d.costCents;
             return AppTableText(
@@ -235,7 +258,7 @@ class _DamageTableState extends State<DamageTable> {
   }
 
   Future<void> _openForm(BuildContext context, {DamageRecord? damage}) async {
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) =>
           DamageFormDialog(damage: damage, trailerId: widget.trailerId),

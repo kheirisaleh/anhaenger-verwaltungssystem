@@ -29,8 +29,8 @@ Future<bool> runAction(
   return false;
 }
 
-void showSavedIfTrue(BuildContext context, bool? saved) {
-  if (saved == true && context.mounted) {
+void showSavedIfTrue(BuildContext context, Object? result) {
+  if (result != null && result != false && context.mounted) {
     AppMessages.success(context);
   }
 }

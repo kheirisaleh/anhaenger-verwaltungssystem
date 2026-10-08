@@ -11,10 +11,12 @@ import '../../../core/design/widgets/app_icon_button.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
 import '../../../core/design/widgets/app_search_field.dart';
 import '../../../core/design/widgets/app_state_views.dart';
+import '../../../core/design/app_typography.dart';
 import '../../../data/models/customer.dart';
 import '../../../shared/app_dependencies.dart';
 import '../../../shared/run_action.dart';
 import '../../../shared/scoped_navigation.dart';
+import '../../contracts/presentation/contract_form_dialog.dart';
 import '../application/customer_list_controller.dart';
 import 'customer_detail_page.dart';
 import 'customer_form_dialog.dart';
@@ -98,7 +100,17 @@ class _CustomersPageState extends State<CustomersPage> {
                           onAction: () => _edit(context),
                         );
                 }
-                return _buildTable(context, customers);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                      '${customers.length} ${AppStrings.customersCount}',
+                      style: AppText.caption,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Expanded(child: _buildTable(context, customers)),
+                  ],
+                );
               },
         ),
       ),
@@ -109,7 +121,7 @@ class _CustomersPageState extends State<CustomersPage> {
     return AppDataTable<Customer>(
       rows: customers,
       onRowTap: (Customer customer) => _open(context, customer),
-      actionsWidth: 140,
+      actionsWidth: 176,
       columns: <AppDataColumn<Customer>>[
         AppDataColumn<Customer>(
           label: AppStrings.fieldName,
@@ -119,11 +131,14 @@ class _CustomersPageState extends State<CustomersPage> {
                 ? '${c.fullName} (${AppStrings.archived})'
                 : c.fullName,
           ),
+          sortValue: (Customer c) =>
+              '${c.lastName} ${c.firstName}'.toLowerCase(),
         ),
         AppDataColumn<Customer>(
           label: AppStrings.fieldEmail,
           flex: 2,
           cellBuilder: (Customer c) => AppTableText(c.email, isMuted: true),
+          sortValue: (Customer c) => c.email.toLowerCase(),
         ),
         AppDataColumn<Customer>(
           label: AppStrings.fieldPhone,
@@ -132,9 +147,16 @@ class _CustomersPageState extends State<CustomersPage> {
         AppDataColumn<Customer>(
           label: AppStrings.fieldCity,
           cellBuilder: (Customer c) => AppTableText(c.city),
+          sortValue: (Customer c) => c.city.toLowerCase(),
         ),
       ],
       actionsBuilder: (Customer customer) => <Widget>[
+        if (!customer.isArchived)
+          AppIconButton(
+            icon: AppIcons.rent,
+            tooltip: AppStrings.contractCreate,
+            onPressed: () => _createContract(context, customer),
+          ),
         AppIconButton(
           icon: AppIcons.edit,
           tooltip: AppStrings.actionEdit,
@@ -163,9 +185,19 @@ class _CustomersPageState extends State<CustomersPage> {
   }
 
   Future<void> _edit(BuildContext context, {Customer? customer}) async {
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => CustomerFormDialog(customer: customer),
+    );
+    if (context.mounted) {
+      showSavedIfTrue(context, saved);
+    }
+  }
+
+  Future<void> _createContract(BuildContext context, Customer customer) async {
+    final Object? saved = await showScopedDialog<Object>(
+      context,
+      (BuildContext context) => ContractFormDialog(customerId: customer.id),
     );
     if (context.mounted) {
       showSavedIfTrue(context, saved);

@@ -11,22 +11,33 @@ class AppTextField extends StatelessWidget {
     this.controller,
     this.placeholder,
     this.errorText,
+    this.helperText,
     this.isRequired = false,
     this.maxLines = 1,
+    this.autofocus = false,
+    this.suffixText,
     this.onChanged,
+    this.onSubmitted,
   });
 
   final String label;
   final TextEditingController? controller;
   final String? placeholder;
   final String? errorText;
+  final String? helperText;
   final bool isRequired;
   final int maxLines;
+  final bool autofocus;
+  final String? suffixText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
-    final bool hasError = errorText != null && errorText!.isNotEmpty;
+    final String? error = errorText;
+    final String? helper = helperText;
+    final String? suffix = suffixText;
+    final bool hasError = error != null && error.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -36,8 +47,16 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           placeholder: placeholder,
           maxLines: maxLines,
+          autofocus: autofocus,
           onChanged: onChanged,
+          onSubmitted: maxLines == 1 ? onSubmitted : null,
           style: AppText.body,
+          suffix: suffix == null
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: Text(suffix, style: AppText.bodyMuted),
+                ),
           decoration: WidgetStatePropertyAll<BoxDecoration>(
             BoxDecoration(
               color: AppColors.surface,
@@ -48,12 +67,12 @@ class AppTextField extends StatelessWidget {
             ),
           ),
         ),
-        if (hasError) ...<Widget>[
+        if (error != null && error.isNotEmpty) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            errorText!,
-            style: AppText.caption.copyWith(color: AppColors.danger),
-          ),
+          Text(error, style: AppText.caption.copyWith(color: AppColors.danger)),
+        ] else if (helper != null) ...<Widget>[
+          const SizedBox(height: AppSpacing.xs),
+          Text(helper, style: AppText.caption),
         ],
       ],
     );

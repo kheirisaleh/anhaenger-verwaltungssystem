@@ -155,7 +155,7 @@ Kein Schatten. Optionaler Titel in `AppText.cardTitle`, darunter `AppSpacing.sm`
 ### AppDataTable
 Verwendung: `AppDataTable<T>(columns: [AppDataColumn<T>(label:, cellBuilder:, flex:, isNumeric:)], rows:, onRowTap:, actionsBuilder:)`. Aktionen mit `AppIconButton`.
 Kopfzeile: `AppText.label`, Hintergrund `AppColors.background`, Hoehe 36.
-Datenzeile: Hoehe 40, Trennlinie `AppColors.divider`, Hover `AppColors.background`.
+Datenzeile: Hoehe 44, Trennlinie `AppColors.divider`, Hover `AppColors.background`.
 Zellen-Padding horizontal `AppSpacing.md`.
 Zahlen und Betraege rechtsbuendig, Text linksbuendig.
 Datum immer `TT.MM.JJJJ`. Betrag immer `1.234,50 Euro`.
@@ -205,6 +205,11 @@ Nur Icon, Größe 16, mit Pflicht-Tooltip. Für Aktionsspalten in Tabellen. `isD
 | `AppSearchField` | Suchfeld mit Lupe für Filterleisten |
 | `AppMessages.success` / `.error` | Meldungsleiste unten nach Aktionen |
 | `AppStatTile`, `AppBarChart`, `AppLineChart`, `AppKeyValue` | Dashboard-Kacheln, Diagramme, Beschriftung/Wert in Seitenleisten |
+| `AppFilterChips` | Schnellfilter mit Anzahl über Listen, z. B. Status. Ausgewählter Chip in `accent` |
+| `AppSelectField(action:, helperText:)` | Rechts daneben ein „+ Neu“-Knopf zum Anlegen ohne Dialogwechsel, Hinweistext darunter |
+| `AppDataColumn(sortValue:)` | Spalte per Klick auf die Überschrift sortierbar |
+
+Tabellenzeilen sind 44 px hoch (Tablet-Bedienung).
 
 ---
 

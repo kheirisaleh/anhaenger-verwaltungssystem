@@ -268,4 +268,39 @@ abstract final class AppStrings {
   static const String fileTypeImages = 'Bilder';
   static const String errorFile =
       'Die Datei konnte nicht gelesen oder geschrieben werden.';
+
+  static const String actionNew = 'Neu';
+  static const String actionClearSearch = 'Suche leeren';
+  static const String resultsOf = 'von';
+  static const String customersCount = 'Kunden';
+  static const String damagesCount = 'Einträge';
+  static const String currencyEuro = 'Euro';
+  static const String perDay = 'pro Tag';
+  static const String day = 'Tag';
+  static const String hoursShort = 'Std.';
+  static const String helperInternalCode =
+      'Kurzer, eindeutiger Name, z. B. auf dem Aufkleber am Anhänger.';
+  static const String trailerRent = 'Vermieten';
+  static const String trailerRentedHint =
+      'Der Anhänger ist vermietet. Der Status ändert sich bei der Rücknahme automatisch.';
+  static const String trailerStatusChanged = 'Status geändert auf';
+  static const String trailerBooked = 'im Zeitraum belegt';
+  static const String contractSearch =
+      'Suchen nach Kunde, Anhänger oder Vertragsnummer';
+  static const String contractFilterAttention = 'Heute fällig';
+  static const String contractOverdue = 'Überfällig';
+  static const String contractDueToday = 'Heute';
+  static const String contractQuickDuration = 'Schnellwahl Dauer:';
+  static const String contractDuration = 'Dauer';
+  static const String contractTrailerHint =
+      'Belegte Anhänger sind für den gewählten Zeitraum ausgegraut.';
+  static const String contractTrailerNotReady =
+      'Achtung: Der Anhänger ist aktuell nicht verfügbar';
+  static const String contractHandOverNow =
+      'Anhänger sofort an den Kunden übergeben';
+  static const String dashboardToday = 'Heute zu tun';
+  static const String dashboardTodayEmpty =
+      'Keine fälligen Übergaben oder Rücknahmen. Zeit für einen Kaffee.';
+  static const String backupNoneFound =
+      'Im Export-Ordner wurde keine Sicherung gefunden.';
 }

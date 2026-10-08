@@ -1,17 +1,19 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/design/app_typography.dart';
+import '../../../core/design/app_icons.dart';
+import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_dialog.dart';
 import '../../../core/design/widgets/app_form.dart';
 import '../../../core/design/widgets/app_select_field.dart';
 import '../../../core/design/widgets/app_state_views.dart';
 import '../../../core/design/widgets/app_text_field.dart';
 import '../../../core/validation/validators.dart';
-import '../../../data/models/enums.dart';
 import '../../../data/models/trailer.dart';
 import '../../../data/repositories/repository_exception.dart';
 import '../../../shared/app_dependencies.dart';
+import '../../../shared/name_dialog.dart';
+import '../../../shared/scoped_navigation.dart';
 
 class TrailerFormDialog extends StatefulWidget {
   const TrailerFormDialog({super.key, this.trailer});
@@ -30,7 +32,7 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
     text: widget.trailer?.licensePlate ?? '',
   );
   late int? _typeId = widget.trailer?.type.id;
-  Future<List<TrailerType>>? _types;
+  Stream<List<TrailerType>>? _types;
   String? _codeError;
   String? _plateError;
   String? _typeError;
@@ -40,7 +42,7 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _types ??= AppScope.of(context).trailerTypes.watchAll().first;
+    _types ??= AppScope.of(context).trailerTypes.watchAll();
   }
 
   @override
@@ -59,8 +61,8 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
       confirmLabel: AppStrings.actionSave,
       isLoading: _isSaving,
       onConfirm: _save,
-      content: FutureBuilder<List<TrailerType>>(
-        future: _types,
+      content: StreamBuilder<List<TrailerType>>(
+        stream: _types,
         builder:
             (BuildContext context, AsyncSnapshot<List<TrailerType>> snapshot) {
               final List<TrailerType>? types = snapshot.data;
@@ -74,8 +76,11 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
                     label: AppStrings.fieldInternalCode,
                     controller: _code,
                     isRequired: true,
+                    autofocus: true,
                     placeholder: AppStrings.placeholderInternalCode,
+                    helperText: AppStrings.helperInternalCode,
                     errorText: _codeError,
+                    onSubmitted: (_) => _save(),
                   ),
                   AppTextField(
                     label: AppStrings.fieldLicensePlate,
@@ -83,6 +88,7 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
                     isRequired: true,
                     placeholder: AppStrings.placeholderLicensePlate,
                     errorText: _plateError,
+                    onSubmitted: (_) => _save(),
                   ),
                   AppSelectField<int>(
                     label: AppStrings.fieldTrailerType,
@@ -97,6 +103,11 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
                         AppSelectOption<int>(value: type.id, label: type.name),
                     ],
                     onChanged: (int? id) => setState(() => _typeId = id),
+                    action: AppButton(
+                      label: AppStrings.actionNew,
+                      icon: AppIcons.add,
+                      onPressed: _createType,
+                    ),
                   ),
                 ],
               );
@@ -105,7 +116,28 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
     );
   }
 
+  Future<void> _createType() async {
+    final AppDependencies dependencies = AppScope.of(context);
+    final Object? created = await showScopedDialog<Object>(
+      context,
+      (BuildContext context) => NameDialog(
+        title: AppStrings.trailerTypeCreate,
+        label: AppStrings.fieldName,
+        onSave: (String name) => dependencies.trailerTypes.create(name),
+      ),
+    );
+    if (created is TrailerType && mounted) {
+      setState(() {
+        _typeId = created.id;
+        _typeError = null;
+      });
+    }
+  }
+
   Future<void> _save() async {
+    if (_isSaving) {
+      return;
+    }
     final int? typeId = _typeId;
     setState(() {
       _codeError = Validators.required(_code.text);
@@ -128,101 +160,18 @@ class _TrailerFormDialogState extends State<TrailerFormDialog> {
     setState(() => _isSaving = true);
     try {
       final Trailer? existing = widget.trailer;
+      final Trailer? result;
       if (existing == null) {
-        await dependencies.trailers.create(
+        result = await dependencies.trailers.create(
           draft,
           userId: dependencies.currentUserId,
         );
       } else {
         await dependencies.trailers.update(existing.id, draft);
+        result = await dependencies.trailers.watchById(existing.id).first;
       }
       if (mounted) {
-        Navigator.of(context).pop(true);
-      }
-    } on RepositoryException catch (error) {
-      if (mounted) {
-        setState(() {
-          _error = error.message;
-          _isSaving = false;
-        });
-      }
-    }
-  }
-}
-
-class TrailerStatusDialog extends StatefulWidget {
-  const TrailerStatusDialog({super.key, required this.trailer});
-
-  final Trailer trailer;
-
-  @override
-  State<TrailerStatusDialog> createState() => _TrailerStatusDialogState();
-}
-
-class _TrailerStatusDialogState extends State<TrailerStatusDialog> {
-  late TrailerStatus _status = widget.trailer.status == TrailerStatus.rented
-      ? TrailerStatus.available
-      : widget.trailer.status;
-  String? _error;
-  bool _isSaving = false;
-
-  bool get _isRented => widget.trailer.status == TrailerStatus.rented;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppDialog(
-      title: AppStrings.trailerChangeStatus,
-      confirmLabel: _isRented ? AppStrings.actionClose : AppStrings.actionSave,
-      isLoading: _isSaving,
-      onConfirm: _isRented ? () => Navigator.of(context).pop(false) : _save,
-      content: AppForm(
-        errorMessage: _error,
-        children: <Widget>[
-          if (_isRented)
-            const Text(
-              AppStrings.errorStatusChangeNotAllowed,
-              style: AppText.body,
-            )
-          else ...<Widget>[
-            const Text(AppStrings.trailerStatusHint, style: AppText.bodyMuted),
-            AppSelectField<TrailerStatus>(
-              label: AppStrings.fieldStatus,
-              isRequired: true,
-              value: _status,
-              options: <AppSelectOption<TrailerStatus>>[
-                for (final TrailerStatus status in TrailerStatus.values)
-                  if (status != TrailerStatus.rented)
-                    AppSelectOption<TrailerStatus>(
-                      value: status,
-                      label: status.label,
-                    ),
-              ],
-              onChanged: (TrailerStatus? status) {
-                if (status != null) {
-                  setState(() => _status = status);
-                }
-              },
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Future<void> _save() async {
-    final AppDependencies dependencies = AppScope.of(context);
-    setState(() {
-      _isSaving = true;
-      _error = null;
-    });
-    try {
-      await dependencies.trailers.changeStatus(
-        widget.trailer.id,
-        _status,
-        userId: dependencies.currentUserId,
-      );
-      if (mounted) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pop(result ?? true);
       }
     } on RepositoryException catch (error) {
       if (mounted) {
@@ -280,6 +229,8 @@ class _TrailerLocationDialogState extends State<TrailerLocationDialog> {
           AppTextField(
             label: AppStrings.fieldAddress,
             controller: _address,
+            autofocus: true,
+            onSubmitted: (_) => _save(),
             placeholder: AppStrings.placeholderAddress,
           ),
           AppFormRow(
@@ -287,12 +238,14 @@ class _TrailerLocationDialogState extends State<TrailerLocationDialog> {
               AppTextField(
                 label: AppStrings.fieldLatitude,
                 controller: _latitude,
+                onSubmitted: (_) => _save(),
                 placeholder: AppStrings.placeholderLatitude,
                 errorText: _latitudeError,
               ),
               AppTextField(
                 label: AppStrings.fieldLongitude,
                 controller: _longitude,
+                onSubmitted: (_) => _save(),
                 placeholder: AppStrings.placeholderLongitude,
                 errorText: _longitudeError,
               ),

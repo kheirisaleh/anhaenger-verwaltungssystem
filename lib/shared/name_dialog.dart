@@ -1,11 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-import '../../../core/constants/app_strings.dart';
-import '../../../core/design/widgets/app_dialog.dart';
-import '../../../core/design/widgets/app_form.dart';
-import '../../../core/design/widgets/app_text_field.dart';
-import '../../../core/validation/validators.dart';
-import '../../../data/repositories/repository_exception.dart';
+import '../core/constants/app_strings.dart';
+import '../core/design/widgets/app_dialog.dart';
+import '../core/design/widgets/app_form.dart';
+import '../core/design/widgets/app_text_field.dart';
+import '../core/validation/validators.dart';
+import '../data/repositories/repository_exception.dart';
 
 class NameDialog extends StatefulWidget {
   const NameDialog({
@@ -19,7 +19,7 @@ class NameDialog extends StatefulWidget {
   final String title;
   final String label;
   final String initialValue;
-  final Future<void> Function(String name) onSave;
+  final Future<Object?> Function(String name) onSave;
 
   @override
   State<NameDialog> createState() => _NameDialogState();
@@ -53,6 +53,8 @@ class _NameDialogState extends State<NameDialog> {
             label: widget.label,
             controller: _name,
             isRequired: true,
+            autofocus: true,
+            onSubmitted: (_) => _save(),
             errorText: _nameError,
           ),
         ],
@@ -70,9 +72,9 @@ class _NameDialogState extends State<NameDialog> {
     }
     setState(() => _isSaving = true);
     try {
-      await widget.onSave(_name.text.trim());
+      final Object? result = await widget.onSave(_name.text.trim());
       if (mounted) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pop(result ?? true);
       }
     } on RepositoryException catch (error) {
       if (mounted) {

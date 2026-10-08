@@ -21,7 +21,7 @@ import '../../../shared/app_dependencies.dart';
 import '../../../shared/file_dialogs.dart';
 import '../../../shared/run_action.dart';
 import '../../../shared/scoped_navigation.dart';
-import 'name_dialog.dart';
+import '../../../shared/name_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -223,7 +223,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _createUser(BuildContext context) async {
     final AppDependencies dependencies = AppScope.of(context);
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => NameDialog(
         title: AppStrings.userCreate,
@@ -238,7 +238,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _renameUser(BuildContext context, AppUser user) async {
     final AppDependencies dependencies = AppScope.of(context);
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => NameDialog(
         title: AppStrings.actionRename,
@@ -266,7 +266,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _createType(BuildContext context) async {
     final AppDependencies dependencies = AppScope.of(context);
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => NameDialog(
         title: AppStrings.trailerTypeCreate,
@@ -281,7 +281,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _renameType(BuildContext context, TrailerType type) async {
     final AppDependencies dependencies = AppScope.of(context);
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => NameDialog(
         title: AppStrings.actionRename,
@@ -338,8 +338,14 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _importBackup(BuildContext context) async {
     final AppDependencies dependencies = AppScope.of(context);
     final AppRestart? restart = AppScope.restartOf(context);
-    final Directory? source = await FileDialogs.pickDirectory();
-    if (source == null || !context.mounted) {
+    final Directory? source = await FileDialogs.pickBackupFolder();
+    if (!context.mounted) {
+      return;
+    }
+    if (source == null) {
+      if (FileDialogs.isMobile) {
+        AppMessages.error(context, AppStrings.backupNoneFound);
+      }
       return;
     }
     if (!BackupService.isBackupFolder(source)) {
@@ -348,9 +354,12 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     final bool? confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) => const AppDialog(
+      builder: (BuildContext context) => AppDialog(
         title: AppStrings.backupImport,
-        content: Text(AppStrings.backupImportConfirm, style: AppText.body),
+        content: Text(
+          '${AppStrings.backupImportConfirm}\n\n${source.path}',
+          style: AppText.body,
+        ),
         confirmLabel: AppStrings.backupImport,
         isDestructive: true,
       ),

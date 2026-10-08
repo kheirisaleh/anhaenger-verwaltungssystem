@@ -13,6 +13,7 @@ import '../../../data/models/customer.dart';
 import '../../../shared/app_dependencies.dart';
 import '../../../shared/run_action.dart';
 import '../../../shared/scoped_navigation.dart';
+import '../../contracts/presentation/contract_form_dialog.dart';
 import '../../contracts/presentation/contract_table.dart';
 import 'customer_form_dialog.dart';
 
@@ -56,6 +57,14 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
               : customer.fullName,
           onBack: () => Navigator.of(context).pop(),
           actions: <Widget>[
+            AppButton(
+              label: AppStrings.contractCreate,
+              icon: AppIcons.rent,
+              variant: AppButtonVariant.primary,
+              onPressed: customer.isArchived
+                  ? null
+                  : () => _createContract(context, customer),
+            ),
             AppButton(
               label: AppStrings.actionEdit,
               icon: AppIcons.edit,
@@ -127,8 +136,18 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
     );
   }
 
+  Future<void> _createContract(BuildContext context, Customer customer) async {
+    final Object? saved = await showScopedDialog<Object>(
+      context,
+      (BuildContext context) => ContractFormDialog(customerId: customer.id),
+    );
+    if (context.mounted) {
+      showSavedIfTrue(context, saved);
+    }
+  }
+
   Future<void> _edit(BuildContext context, Customer customer) async {
-    final bool? saved = await showScopedDialog<bool>(
+    final Object? saved = await showScopedDialog<Object>(
       context,
       (BuildContext context) => CustomerFormDialog(customer: customer),
     );

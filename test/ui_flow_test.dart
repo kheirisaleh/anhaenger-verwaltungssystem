@@ -72,13 +72,24 @@ void main() {
     expect(find.text('MAMMUT-08'), findsOneWidget);
     await openAndCancelDialog(tester, AppStrings.trailerCreate);
 
+    await tester.tap(find.text(AppStrings.fieldLicensePlate));
+    await settle(tester);
+    await tester.tap(find.textContaining('${AppStrings.statusRented} ('));
+    await settle(tester);
+    expect(find.text('BLITZ-01'), findsOneWidget);
+    expect(find.text('OMA-03'), findsNothing);
+    await tester.tap(find.textContaining('${AppStrings.filterAll} ('));
+    await settle(tester);
+    expect(find.text('OMA-03'), findsOneWidget);
+
     await tester.tap(find.text('BLITZ-01'));
     await settle(tester);
     expect(find.textContaining('BLITZ-01 ·'), findsOneWidget);
     expect(find.text(AppStrings.sectionDamageHistory), findsOneWidget);
     expect(find.text(AppStrings.sectionStatusHistory), findsOneWidget);
     await openAndCancelDialog(tester, AppStrings.trailerChangeLocation);
-    await openAndCancelDialog(tester, AppStrings.trailerChangeStatus);
+    expect(find.text(AppStrings.trailerRentedHint), findsOneWidget);
+    await openAndCancelDialog(tester, AppStrings.trailerRent);
     Navigator.of(
       tester.element(find.text(AppStrings.sectionStatusHistory)),
     ).pop();
@@ -102,7 +113,21 @@ void main() {
     await openPane(tester, AppStrings.navContracts);
     expect(find.text(AppStrings.contractStatusPlanned), findsWidgets);
     expect(find.text(AppStrings.contractStatusActive), findsWidgets);
-    await openAndCancelDialog(tester, AppStrings.contractCreate);
+    await tester.tap(
+      find.textContaining('${AppStrings.contractStatusPlanned} ('),
+    );
+    await settle(tester);
+    expect(find.text(AppStrings.contractStatusActive), findsNothing);
+    await tester.tap(find.text(AppStrings.contractCreate).first);
+    await settle(tester);
+    await tester.tap(find.text(AppStrings.actionNew).first);
+    await settle(tester);
+    expect(find.text('${AppStrings.fieldFirstName} *'), findsOneWidget);
+    await tester.tap(find.text(AppStrings.actionCancel).last);
+    await settle(tester);
+    expect(find.text('${AppStrings.fieldFirstName} *'), findsNothing);
+    await tester.tap(find.text(AppStrings.actionCancel).last);
+    await settle(tester);
 
     await openPane(tester, AppStrings.navSettings);
     expect(find.text(AppStrings.settingsUsers), findsOneWidget);

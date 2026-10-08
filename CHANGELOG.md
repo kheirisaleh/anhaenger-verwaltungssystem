@@ -4,6 +4,17 @@ Alle relevanten Änderungen am Projekt werden hier festgehalten.
 
 ## [Unreleased]
 
+### Changed (Bedienbarkeit, ADR-006)
+
+- „+ Neu“ für Kunde, Anhänger und Anhängertyp direkt in den Formularen
+- Vertragsdialog mit Belegungsprüfung je Anhänger, Schnellwahl der Dauer, Preis pro Tag und „sofort übergeben“
+- Filter-Chips mit Anzahl, sortierbare Spalten, Suche mit Lösch-Knopf, Trefferanzahl
+- „Heute zu tun“ im Dashboard, Zähler in der Navigation, Kennzeichnung fälliger und überfälliger Verträge
+- Status direkt in der Anhänger-Detailansicht ändern, „Vermieten“ und „Vertrag anlegen“ als Schnellaktionen
+- Autofokus und Enter zum Speichern in Formularen
+- Tablet: einklappbare Navigation, größere Zeilen, Export ohne Speicherdialog
+- Android-APK und Linux-AppImage in der CI
+
 ### Added (Verwaltungsoberfläche)
 
 - Vollständige Seiten für Dashboard, Anhänger, Schäden, Kunden, Verträge und Einstellungen

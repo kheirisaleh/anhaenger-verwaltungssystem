@@ -36,6 +36,25 @@ class RentalContract {
   bool get isEditable => status == ContractStatus.planned;
 
   Duration get duration => endAt.difference(startAt);
+
+  bool isHandOverDue(DateTime now) =>
+      status == ContractStatus.planned && !startAt.isAfter(_endOfDay(now));
+
+  bool isReturnDue(DateTime now) =>
+      status == ContractStatus.active && !endAt.isAfter(_endOfDay(now));
+
+  bool isOverdue(DateTime now) =>
+      (status == ContractStatus.active && endAt.isBefore(now)) ||
+      (status == ContractStatus.planned &&
+          startAt.isBefore(DateTime(now.year, now.month, now.day)));
+
+  bool needsAttention(DateTime now) => isHandOverDue(now) || isReturnDue(now);
+
+  bool overlaps(DateTime start, DateTime end) =>
+      status.blocksTrailer && startAt.isBefore(end) && endAt.isAfter(start);
+
+  static DateTime _endOfDay(DateTime value) =>
+      DateTime(value.year, value.month, value.day, 23, 59, 59);
 }
 
 class RentalContractDraft {

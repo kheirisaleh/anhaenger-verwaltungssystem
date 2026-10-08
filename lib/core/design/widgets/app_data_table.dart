@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../app_colors.dart';
+import '../app_icons.dart';
 import '../app_spacing.dart';
 import '../app_typography.dart';
 
@@ -10,15 +11,17 @@ class AppDataColumn<T> {
     required this.cellBuilder,
     this.flex = 1,
     this.isNumeric = false,
+    this.sortValue,
   });
 
   final String label;
   final Widget Function(T item) cellBuilder;
   final int flex;
   final bool isNumeric;
+  final Comparable<Object> Function(T item)? sortValue;
 }
 
-class AppDataTable<T> extends StatelessWidget {
+class AppDataTable<T> extends StatefulWidget {
   const AppDataTable({
     super.key,
     required this.columns,
@@ -37,11 +40,49 @@ class AppDataTable<T> extends StatelessWidget {
   final bool shrinkWrap;
 
   @override
+  State<AppDataTable<T>> createState() => _AppDataTableState<T>();
+}
+
+class _AppDataTableState<T> extends State<AppDataTable<T>> {
+  int? _sortColumn;
+  bool _ascending = true;
+
+  List<T> get _sortedRows {
+    final int? index = _sortColumn;
+    if (index == null || index >= widget.columns.length) {
+      return widget.rows;
+    }
+    final Comparable<Object> Function(T item)? value =
+        widget.columns[index].sortValue;
+    if (value == null) {
+      return widget.rows;
+    }
+    final List<T> sorted = List<T>.of(widget.rows)
+      ..sort((T a, T b) {
+        final int result = value(a).compareTo(value(b));
+        return _ascending ? result : -result;
+      });
+    return sorted;
+  }
+
+  void _toggleSort(int index) {
+    setState(() {
+      if (_sortColumn == index) {
+        _ascending = !_ascending;
+      } else {
+        _sortColumn = index;
+        _ascending = true;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ValueChanged<T>? tap = onRowTap;
+    final ValueChanged<T>? tap = widget.onRowTap;
+    final List<T> rows = _sortedRows;
     final Widget list = ListView.builder(
-      shrinkWrap: shrinkWrap,
-      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
+      shrinkWrap: widget.shrinkWrap,
+      physics: widget.shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       itemCount: rows.length,
       itemBuilder: (BuildContext context, int index) {
         final T item = rows[index];
@@ -59,10 +100,10 @@ class AppDataTable<T> extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
-        mainAxisSize: shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
+        mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
         children: <Widget>[
           _buildHeader(),
-          if (shrinkWrap) list else Expanded(child: list),
+          if (widget.shrinkWrap) list else Expanded(child: list),
         ],
       ),
     );
@@ -74,36 +115,63 @@ class AppDataTable<T> extends StatelessWidget {
       color: AppColors.background,
       child: Row(
         children: <Widget>[
-          for (final AppDataColumn<T> column in columns)
+          for (int i = 0; i < widget.columns.length; i++)
             Expanded(
-              flex: column.flex,
-              child: _cell(
-                Text(
-                  column.label,
-                  style: AppText.label,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                isNumeric: column.isNumeric,
-              ),
+              flex: widget.columns[i].flex,
+              child: _buildHeaderCell(i, widget.columns[i]),
             ),
-          if (actionsBuilder != null) SizedBox(width: actionsWidth),
+          if (widget.actionsBuilder != null)
+            SizedBox(width: widget.actionsWidth),
         ],
       ),
     );
   }
 
+  Widget _buildHeaderCell(int index, AppDataColumn<T> column) {
+    final bool isSorted = _sortColumn == index;
+    final Widget label = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Flexible(
+          child: Text(
+            column.label,
+            style: AppText.label,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (isSorted) ...<Widget>[
+          const SizedBox(width: AppSpacing.xs),
+          Icon(
+            _ascending ? AppIcons.sortAscending : AppIcons.sortDescending,
+            size: AppSizes.iconTiny,
+            color: AppColors.textSecondary,
+          ),
+        ],
+      ],
+    );
+    final Widget cell = _cell(label, isNumeric: column.isNumeric);
+    if (column.sortValue == null) {
+      return cell;
+    }
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _toggleSort(index),
+      child: cell,
+    );
+  }
+
   Widget _buildCells(T item) {
-    final List<Widget> Function(T item)? actions = actionsBuilder;
+    final List<Widget> Function(T item)? actions = widget.actionsBuilder;
     return Row(
       children: <Widget>[
-        for (final AppDataColumn<T> column in columns)
+        for (final AppDataColumn<T> column in widget.columns)
           Expanded(
             flex: column.flex,
             child: _cell(column.cellBuilder(item), isNumeric: column.isNumeric),
           ),
         if (actions != null)
           SizedBox(
-            width: actionsWidth,
+            width: widget.actionsWidth,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: actions(item),
@@ -125,16 +193,24 @@ class AppDataTable<T> extends StatelessWidget {
 }
 
 class AppTableText extends StatelessWidget {
-  const AppTableText(this.text, {super.key, this.isMuted = false});
+  const AppTableText(
+    this.text, {
+    super.key,
+    this.isMuted = false,
+    this.color,
+  });
 
   final String text;
   final bool isMuted;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final TextStyle base = isMuted ? AppText.bodyMuted : AppText.body;
+    final Color? textColor = color;
     return Text(
       text,
-      style: isMuted ? AppText.bodyMuted : AppText.body,
+      style: textColor == null ? base : base.copyWith(color: textColor),
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
     );

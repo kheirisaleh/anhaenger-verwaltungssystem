@@ -23,6 +23,10 @@ abstract final class AppIcons {
   static const IconData history = FluentIcons.history;
   static const IconData open = FluentIcons.chevron_right;
   static const IconData sampleData = FluentIcons.refresh;
+  static const IconData sortAscending = FluentIcons.sort_up;
+  static const IconData sortDescending = FluentIcons.sort_down;
+  static const IconData clear = FluentIcons.clear;
+  static const IconData rent = FluentIcons.event;
 
   static const IconData dashboard = FluentIcons.view_dashboard;
   static const IconData trailers = FluentIcons.car;

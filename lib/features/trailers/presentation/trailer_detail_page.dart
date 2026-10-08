@@ -9,15 +9,18 @@ import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_charts.dart';
 import '../../../core/design/widgets/app_dialog.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
+import '../../../core/design/widgets/app_select_field.dart';
 import '../../../core/design/widgets/app_state_views.dart';
 import '../../../core/design/widgets/app_status_badge.dart';
 import '../../../core/formatting/app_formats.dart';
+import '../../../data/models/enums.dart';
 import '../../../data/models/photo.dart';
 import '../../../data/models/trailer.dart';
 import '../../../shared/app_dependencies.dart';
 import '../../../shared/photo_gallery.dart';
 import '../../../shared/run_action.dart';
 import '../../../shared/scoped_navigation.dart';
+import '../../contracts/presentation/contract_form_dialog.dart';
 import '../../contracts/presentation/contract_table.dart';
 import '../../damages/presentation/damage_table.dart';
 import 'trailer_dialogs.dart';
@@ -93,13 +96,15 @@ class _TrailerDetailPageState extends State<TrailerDetailPage> {
   List<Widget> _actions(BuildContext context, Trailer trailer) {
     return <Widget>[
       AppButton(
-        label: AppStrings.trailerChangeStatus,
-        icon: AppIcons.status,
+        label: AppStrings.trailerRent,
+        icon: AppIcons.rent,
+        variant: AppButtonVariant.primary,
         onPressed: trailer.isArchived
             ? null
             : () => _openDialog(
                 context,
-                (BuildContext context) => TrailerStatusDialog(trailer: trailer),
+                (BuildContext context) =>
+                    ContractFormDialog(trailerId: trailer.id),
               ),
       ),
       AppButton(
@@ -168,10 +173,8 @@ class _TrailerDetailPageState extends State<TrailerDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: trailer.isArchived
-                    ? const Text(AppStrings.archived, style: AppText.bodyMuted)
-                    : AppStatusBadge.trailer(trailer.status),
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: _buildStatus(trailer),
               ),
               AppKeyValue(
                 label: AppStrings.fieldInternalCode,
@@ -266,8 +269,52 @@ class _TrailerDetailPageState extends State<TrailerDetailPage> {
     );
   }
 
+  Widget _buildStatus(Trailer trailer) {
+    if (trailer.isArchived) {
+      return const Text(AppStrings.archived, style: AppText.bodyMuted);
+    }
+    if (trailer.status == TrailerStatus.rented) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          AppStatusBadge.trailer(trailer.status),
+          const SizedBox(height: AppSpacing.xs),
+          const Text(AppStrings.trailerRentedHint, style: AppText.caption),
+        ],
+      );
+    }
+    return AppSelectField<TrailerStatus>(
+      label: AppStrings.fieldStatus,
+      value: trailer.status,
+      helperText: AppStrings.trailerStatusHint,
+      options: <AppSelectOption<TrailerStatus>>[
+        for (final TrailerStatus status in TrailerStatus.values)
+          if (status != TrailerStatus.rented)
+            AppSelectOption<TrailerStatus>(value: status, label: status.label),
+      ],
+      onChanged: (TrailerStatus? status) {
+        if (status != null && status != trailer.status) {
+          _changeStatus(trailer, status);
+        }
+      },
+    );
+  }
+
+  Future<void> _changeStatus(Trailer trailer, TrailerStatus status) async {
+    final AppDependencies dependencies = AppScope.of(context);
+    await runAction(
+      context,
+      () => dependencies.trailers.changeStatus(
+        trailer.id,
+        status,
+        userId: dependencies.currentUserId,
+      ),
+      successMessage: '${AppStrings.trailerStatusChanged} ${status.label}',
+    );
+  }
+
   Future<void> _openDialog(BuildContext context, WidgetBuilder builder) async {
-    final bool? saved = await showScopedDialog<bool>(context, builder);
+    final Object? saved = await showScopedDialog<Object>(context, builder);
     if (context.mounted) {
       showSavedIfTrue(context, saved);
     }

@@ -21,6 +21,7 @@ import '../../../data/repositories/trailer_repository.dart';
 import '../../../shared/app_dependencies.dart';
 import '../../../shared/file_dialogs.dart';
 import '../application/dashboard_metrics.dart';
+import 'today_tasks.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -73,13 +74,14 @@ class _DashboardPageState extends State<DashboardPage> {
                   if (trailerList == null || contractList == null) {
                     return const AppLoadingState();
                   }
+                  final DateTime now = DateTime.now();
                   final DashboardMetrics metrics = DashboardMetrics.compute(
                     trailers: trailerList,
                     contracts: contractList,
-                    now: DateTime.now(),
+                    now: now,
                   );
                   _latest = metrics;
-                  return _buildContent(metrics);
+                  return _buildContent(metrics, contractList, now);
                 },
           );
         },
@@ -87,11 +89,17 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildContent(DashboardMetrics metrics) {
+  Widget _buildContent(
+    DashboardMetrics metrics,
+    List<RentalContract> contracts,
+    DateTime now,
+  ) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          TodayTasks(contracts: contracts, now: now),
+          const SizedBox(height: AppSpacing.lg),
           const Text(AppStrings.dashboardFleet, style: AppText.sectionTitle),
           const SizedBox(height: AppSpacing.sm),
           _tiles(<Widget>[
@@ -301,7 +309,10 @@ class _DashboardPageState extends State<DashboardPage> {
         rows,
       );
       if (file != null && context.mounted) {
-        AppMessages.success(context, AppStrings.exportDone);
+        AppMessages.success(
+          context,
+          '${AppStrings.exportDone} ${file.path}',
+        );
       }
     } on FileSystemException {
       if (context.mounted) {

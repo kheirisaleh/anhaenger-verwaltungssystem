@@ -78,12 +78,15 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
               AppTextField(
                 label: AppStrings.fieldFirstName,
                 controller: _firstName,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
+                autofocus: true,
                 errorText: _errors['firstName'],
               ),
               AppTextField(
                 label: AppStrings.fieldLastName,
                 controller: _lastName,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
                 errorText: _errors['lastName'],
               ),
@@ -94,12 +97,14 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
               AppTextField(
                 label: AppStrings.fieldEmail,
                 controller: _email,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
                 errorText: _errors['email'],
               ),
               AppTextField(
                 label: AppStrings.fieldPhone,
                 controller: _phone,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
                 errorText: _errors['phone'],
               ),
@@ -108,6 +113,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
           AppTextField(
             label: AppStrings.fieldStreet,
             controller: _street,
+            onSubmitted: (_) => _save(),
             isRequired: true,
             errorText: _errors['street'],
           ),
@@ -116,12 +122,14 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
               AppTextField(
                 label: AppStrings.fieldPostalCode,
                 controller: _postalCode,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
                 errorText: _errors['postalCode'],
               ),
               AppTextField(
                 label: AppStrings.fieldCity,
                 controller: _city,
+                onSubmitted: (_) => _save(),
                 isRequired: true,
                 errorText: _errors['city'],
               ),
@@ -130,6 +138,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
           AppTextField(
             label: AppStrings.fieldLicenseNumber,
             controller: _license,
+            onSubmitted: (_) => _save(),
           ),
         ],
       ),
@@ -137,6 +146,9 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
   }
 
   Future<void> _save() async {
+    if (_isSaving) {
+      return;
+    }
     final Map<String, String?> errors = <String, String?>{
       'firstName': Validators.required(_firstName.text),
       'lastName': Validators.required(_lastName.text),
@@ -169,13 +181,15 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
     setState(() => _isSaving = true);
     try {
       final Customer? existing = widget.customer;
+      final Customer? result;
       if (existing == null) {
-        await dependencies.customers.create(draft);
+        result = await dependencies.customers.create(draft);
       } else {
         await dependencies.customers.update(existing.id, draft);
+        result = await dependencies.customers.watchById(existing.id).first;
       }
       if (mounted) {
-        Navigator.of(context).pop(true);
+        Navigator.of(context).pop(result ?? true);
       }
     } on RepositoryException catch (error) {
       if (mounted) {

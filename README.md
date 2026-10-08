@@ -44,10 +44,11 @@ flutter test
 
 ## Fertige Versionen ohne eigenen Build
 
-Jeder Push baut über GitHub Actions eine Windows- und eine macOS-Version. Unter **Actions → CI → letzter Lauf → Artifacts** herunterladen:
+Jeder Push baut über GitHub Actions Versionen für Windows, macOS, Linux und Android. Unter **Actions → CI → letzter Lauf → Artifacts** herunterladen:
 
 - `anhaenger-verwaltung-windows`: entpacken, den ganzen Ordner kopieren, `anhaenger_verwaltungssystem.exe` starten
 - `anhaenger-verwaltung-macos`: entpacken, `anhaenger_verwaltungssystem.app` starten (beim ersten Mal Rechtsklick → Öffnen, da nicht signiert)
+- `anhaenger-verwaltung-android`: `Anhaenger-Verwaltung.apk` auf das Tablet kopieren und öffnen (Installation aus unbekannten Quellen erlauben). Optimiert für Tablets im Querformat.
 - `anhaenger-verwaltung-linux`: enthält `Anhaenger-Verwaltung-x86_64.AppImage` (ausführbar machen mit `chmod +x`, dann starten) und zusätzlich ein `tar.gz` des Programmordners. Gebaut auf Ubuntu 22.04, läuft damit auf allen gängigen x86_64-Distributionen ab etwa 2022 (glibc 2.35), auf denen GTK 3 installiert ist (Standard bei GNOME, KDE, Xfce, Cinnamon)
 
 ## Technologie
