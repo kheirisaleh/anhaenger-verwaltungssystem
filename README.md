@@ -48,6 +48,7 @@ Jeder Push baut über GitHub Actions eine Windows- und eine macOS-Version. Unter
 
 - `anhaenger-verwaltung-windows`: entpacken, den ganzen Ordner kopieren, `anhaenger_verwaltungssystem.exe` starten
 - `anhaenger-verwaltung-macos`: entpacken, `anhaenger_verwaltungssystem.app` starten (beim ersten Mal Rechtsklick → Öffnen, da nicht signiert)
+- `anhaenger-verwaltung-linux`: enthält `Anhaenger-Verwaltung-x86_64.AppImage` (ausführbar machen mit `chmod +x`, dann starten) und zusätzlich ein `tar.gz` des Programmordners. Gebaut auf Ubuntu 22.04, läuft damit auf allen gängigen x86_64-Distributionen ab etwa 2022 (glibc 2.35), auf denen GTK 3 installiert ist (Standard bei GNOME, KDE, Xfce, Cinnamon)
 
 ## Technologie
 

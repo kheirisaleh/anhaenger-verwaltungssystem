@@ -81,6 +81,12 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Linux-Projektordner anlegen, falls er fehlt
+        run: |
+          if [ ! -d linux ]; then
+            flutter create --platforms=linux --org de.anhaengerverwaltung --project-name anhaenger_verwaltungssystem .
+          fi
+
       - name: Generieren und formatieren
         run: |
           flutter pub get
@@ -89,14 +95,14 @@ jobs:
 
       - name: Committen, falls sich etwas geändert hat
         run: |
-          git add -A lib test pubspec.lock
+          git add -A lib test pubspec.lock linux .metadata
           if git diff --cached --quiet; then
             echo "Keine Änderungen."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: update generated code, formatting and lockfile"
+          git commit -m "chore: update generated code, formatting, lockfile and platform folders"
           git push
 
   macos:
@@ -156,4 +162,79 @@ jobs:
         with:
           name: anhaenger-verwaltung-windows
           path: build/windows/x64/runner/Release/
+          retention-days: 14
+
+  linux:
+    name: Linux-Build (AppImage)
+    needs: check
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Build-Werkzeuge installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev file
+
+      - name: Linux-Projektordner anlegen, falls er fehlt
+        run: |
+          if [ ! -d linux ]; then
+            flutter create --platforms=linux --org de.anhaengerverwaltung --project-name anhaenger_verwaltungssystem .
+          fi
+
+      - name: Abhängigkeiten
+        run: flutter pub get
+
+      - name: Code generieren (Drift)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build
+        run: |
+          set -o pipefail
+          flutter build linux --release 2>&1 | tee build_linux.txt || {
+            .github/scripts/annotate.sh error "flutter build linux" build_linux.txt
+            exit 1
+          }
+
+      - name: AppImage und Archiv erstellen
+        run: |
+          set -euo pipefail
+          BUNDLE=build/linux/x64/release/bundle
+          APPDIR=AppDir
+          mkdir -p "$APPDIR/usr/bin"
+          cp -r "$BUNDLE"/. "$APPDIR/usr/bin/"
+          cp macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png "$APPDIR/anhaenger-verwaltung.png"
+          cat > "$APPDIR/anhaenger-verwaltung.desktop" <<'DESKTOP'
+          [Desktop Entry]
+          Type=Application
+          Name=Anhänger-Verwaltung
+          Comment=Offline-Verwaltung für eine Anhängervermietung
+          Exec=anhaenger_verwaltungssystem
+          Icon=anhaenger-verwaltung
+          Categories=Office;
+          Terminal=false
+          DESKTOP
+          sed -i 's/^ *//' "$APPDIR/anhaenger-verwaltung.desktop"
+          cat > "$APPDIR/AppRun" <<'APPRUN'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/anhaenger_verwaltungssystem" "$@"
+          APPRUN
+          sed -i 's/^ *//' "$APPDIR/AppRun"
+          chmod +x "$APPDIR/AppRun"
+          wget -q -O appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+          mkdir -p dist
+          ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool "$APPDIR" dist/Anhaenger-Verwaltung-x86_64.AppImage
+          tar -czf dist/anhaenger-verwaltung-linux-x64.tar.gz -C "$BUNDLE" .
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: anhaenger-verwaltung-linux
+          path: dist/
           retention-days: 14
