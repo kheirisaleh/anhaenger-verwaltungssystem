@@ -92,7 +92,7 @@ void main() {
   });
 
   test('Auslastung im aktuellen Monat', () {
-    final double expected = (2 + 4 + 1) / (2 * 31) * 100;
+    const double expected = (2 + 4 + 1) / (2 * 31) * 100;
     expect(metrics.utilizationPercent, closeTo(expected, 0.1));
   });
 }
