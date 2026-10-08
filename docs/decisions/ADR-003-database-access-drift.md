@@ -28,7 +28,7 @@ Ausschlaggebend ist die Typsicherheit: Fehler in KI-generiertem Code (falsche Sp
 ## 4. Regeln
 
 - Tabellen werden in `lib/core/database/tables.dart` definiert, die Datenbank in `lib/core/database/app_database.dart`.
-- Generierte Dateien (`*.g.dart`) werden nicht eingecheckt. Nach dem Klonen und nach jeder Tabellenänderung: `dart run build_runner build --delete-conflicting-outputs`.
+- Generierte Dateien (`*.g.dart`) werden eingecheckt, damit das Projekt nach dem Klonen sofort startet. Nach jeder Tabellenänderung: `dart run build_runner build --delete-conflicting-outputs`. Die CI aktualisiert sie auf `main` zusätzlich automatisch.
 - Drift-Zeilenklassen heißen `<Name>Row` (z. B. `TrailerRow`) und verlassen die Repository-Implementierung nie. Nach außen gibt es nur die Modelle aus `lib/data/models/`.
 - Jede Schemaänderung erhöht `schemaVersion` und braucht eine Migration in `AppDatabase.migration`.
 - Fremdschlüssel werden in `beforeOpen` mit `PRAGMA foreign_keys = ON` aktiviert.

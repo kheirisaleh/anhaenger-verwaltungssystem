@@ -14,7 +14,7 @@ Details: [docs/project/PROJECT_STATUS.md](docs/project/PROJECT_STATUS.md)
 
 ## Starten
 
-Voraussetzung: Flutter (Stable, mindestens Dart 3.11). Unter Windows zusätzlich Visual Studio mit „Desktopentwicklung mit C++“, unter macOS Xcode.
+Voraussetzung: Flutter (Stable, mindestens Dart 3.11, ggf. `flutter upgrade`). Unter Windows zusätzlich Visual Studio mit „Desktopentwicklung mit C++“, unter macOS Xcode (macOS 12 oder neuer).
 
 ```bash
 flutter pub get
@@ -22,7 +22,7 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run -d windows        # oder: -d macos
 ```
 
-`build_runner` erzeugt den Drift-Code (`*.g.dart`). Diese Dateien sind nicht im Repository und müssen nach dem Klonen und nach jeder Änderung an `lib/core/database/tables.dart` neu erzeugt werden.
+Der generierte Drift-Code (`*.g.dart`) und `pubspec.lock` liegen im Repository und werden von der CI auf `main` automatisch aktuell gehalten. Nach dem Klonen reichen deshalb `flutter pub get` und `flutter run`. `build_runner` ist nur nötig, wenn `lib/core/database/tables.dart` geändert wurde.
 
 Prüfen vor jedem Pull Request:
 
@@ -34,9 +34,12 @@ flutter test
 
 Beim ersten Start wird die Datenbank mit dem Benutzer „Administrator“ und fünf Anhängertypen angelegt.
 
-## Fertige Windows-Version ohne eigenen Build
+## Fertige Versionen ohne eigenen Build
 
-Jeder Push baut über GitHub Actions eine Windows-Version. Unter **Actions → CI → letzter Lauf → Artifacts → `anhaenger-verwaltung-windows`** herunterladen, entpacken und `anhaenger_verwaltungssystem.exe` starten.
+Jeder Push baut über GitHub Actions eine Windows- und eine macOS-Version. Unter **Actions → CI → letzter Lauf → Artifacts** herunterladen:
+
+- `anhaenger-verwaltung-windows`: entpacken, den ganzen Ordner kopieren, `anhaenger_verwaltungssystem.exe` starten
+- `anhaenger-verwaltung-macos`: entpacken, `anhaenger_verwaltungssystem.app` starten (beim ersten Mal Rechtsklick → Öffnen, da nicht signiert)
 
 ## Technologie
 

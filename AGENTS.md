@@ -23,14 +23,14 @@ Offline-Desktop-Verwaltungsoberfläche für eine Anhängervermietung (Schulproje
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # nach Klonen und nach jeder Tabellenänderung
+dart run build_runner build --delete-conflicting-outputs   # nach jeder Änderung an tables.dart
 dart format lib test
 flutter analyze            # muss ohne Meldungen laufen
 flutter test
 flutter run -d macos       # bzw. -d windows
 ```
 
-`*.g.dart` wird generiert und nicht eingecheckt. Fehlermeldungen wie „`_$AppDatabase` not found“ bedeuten: `build_runner` ausführen.
+`*.g.dart` wird generiert und eingecheckt. Nie von Hand bearbeiten. Fehlermeldungen wie „`_$AppDatabase` not found“ bedeuten: `build_runner` ausführen. Die CI hält generierten Code, Formatierung und `pubspec.lock` auf `main` automatisch aktuell.
 
 ## Harte Regeln
 

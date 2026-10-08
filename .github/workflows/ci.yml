@@ -14,7 +14,7 @@ jobs:
     name: Analyze und Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: subosito/flutter-action@v2
         with:
@@ -66,12 +66,45 @@ jobs:
             exit 1
           }
 
+  sync-generated:
+    name: Generierten Code einchecken
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generieren und formatieren
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          dart format lib test
+
+      - name: Committen, falls sich etwas geändert hat
+        run: |
+          git add -A lib test pubspec.lock
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update generated code, formatting and lockfile"
+          git push
+
   macos:
     name: macOS-Build
     needs: check
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: subosito/flutter-action@v2
         with:
@@ -92,7 +125,7 @@ jobs:
             exit 1
           }
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: anhaenger-verwaltung-macos
           path: build/macos/Build/Products/Release/
@@ -103,7 +136,7 @@ jobs:
     needs: check
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: subosito/flutter-action@v2
         with:
@@ -119,7 +152,7 @@ jobs:
       - name: Build
         run: flutter build windows --release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: anhaenger-verwaltung-windows
           path: build/windows/x64/runner/Release/
