@@ -18,3 +18,5 @@ build/
 *.sqlite-journal
 /data/
 /backup/
+
+*.g.dart

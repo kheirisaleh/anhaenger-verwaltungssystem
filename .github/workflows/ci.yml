@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Analyze und Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter-Version
+        run: flutter --version
+
+      - name: Abhängigkeiten
+        run: |
+          set -o pipefail
+          flutter pub get 2>&1 | tee pub.txt || {
+            .github/scripts/annotate.sh error "flutter pub get" pub.txt
+            exit 1
+          }
+
+      - name: Code generieren (Drift)
+        run: |
+          set -o pipefail
+          dart run build_runner build --delete-conflicting-outputs 2>&1 | tee build_runner.txt || {
+            .github/scripts/annotate.sh error "build_runner" build_runner.txt
+            exit 1
+          }
+
+      - name: Formatierung prüfen
+        continue-on-error: true
+        run: |
+          dart format --output=none --set-exit-if-changed lib test > format.txt 2>&1 || {
+            .github/scripts/annotate.sh warning "dart format (nicht formatierte Dateien)" format.txt
+            exit 1
+          }
+
+      - name: Analyze
+        run: |
+          set -o pipefail
+          flutter analyze 2>&1 | tee analyze.txt || {
+            .github/scripts/annotate.sh error "flutter analyze" analyze.txt
+            exit 1
+          }
+
+      - name: Test
+        run: |
+          set -o pipefail
+          flutter test --reporter expanded 2>&1 | tee test.txt || {
+            grep -n -B2 -A25 '\[E\]\|EXCEPTION CAUGHT\|Error:' test.txt > test_failures.txt || true
+            .github/scripts/annotate.sh error "flutter test (Fehler)" test_failures.txt
+            .github/scripts/annotate.sh error "flutter test (Ende der Ausgabe)" test.txt
+            exit 1
+          }
+
+  windows:
+    name: Windows-Build
+    needs: check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Abhängigkeiten
+        run: flutter pub get
+
+      - name: Code generieren (Drift)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build
+        run: flutter build windows --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anhaenger-verwaltung-windows
+          path: build/windows/x64/runner/Release/
+          retention-days: 14

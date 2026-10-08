@@ -22,4 +22,5 @@ abstract final class AppColors {
   static const Color statusRented = Color(0xFF0F6CBD);
   static const Color statusMaintenance = Color(0xFFCA5010);
   static const Color statusBlocked = Color(0xFF605E5C);
+  static const Color statusPlanned = Color(0xFF5C2E91);
 }
