@@ -34,7 +34,6 @@ class AppSelectField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String? error = errorText;
-    final bool hasError = error != null && error.isNotEmpty;
     final String? hint = placeholder;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +57,7 @@ class AppSelectField<T> extends StatelessWidget {
             ],
           ),
         ),
-        if (hasError) ...<Widget>[
+        if (error != null && error.isNotEmpty) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
           Text(error, style: AppText.caption.copyWith(color: AppColors.danger)),
         ],

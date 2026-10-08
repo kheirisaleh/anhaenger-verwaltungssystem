@@ -23,7 +23,7 @@ Kritisch für den Projektfortschritt sind vor allem:
 
 Diese Punkte sollten im Datenbank-Task (Task 1) und im Wireframe-Task (Task 2) geklärt werden.
 
-> **Update 08.10.2026:** K1, K2, K3, K5 sowie W2–W5 und R1 sind entschieden, siehe `docs/decisions/ADR-002-admin-scope-and-users.md` und `docs/database/DATABASE_MODEL.md`. Offen bleiben K4/R2 (Kennzahlen) und R3 (Backup).
+> **Update 08.10.2026:** K1, K2, K3, K5 sowie W2–W5 und R1 sind entschieden (ADR-002, `DATABASE_MODEL.md`). Alle Befunde aus Abschnitt 5 sind behoben. Offen bleiben K4/R2 (Kennzahlen), R3 (Backup) und W1 (Hinweis im ADR-001).
 
 ---
 
@@ -151,7 +151,7 @@ PDF: „Manueller Export/Import“. Offen sind Format (SQLite-Datei + Fotos als 
 
 1. ~~Teamentscheidung zu K1/W2 und W3~~ → erledigt in ADR-002.
 2. ~~`DATABASE_MODEL.md`~~ → Entwurf liegt vor, Review durch das Team.
-3. **ADR-003 Datenbankzugriff** (Drift vs. sqflite). Für ein Team, das stark mit KI arbeitet, spricht viel für Drift (typsicher, Migrationen, Fehler beim Kompilieren statt zur Laufzeit), aber das Team entscheidet.
-4. **ADR-004 State Management** und **Routing**, bevor das erste Feature beginnt.
+3. ~~ADR-003 Datenbankzugriff~~ → Drift.
+4. ~~ADR-004 State Management und Routing~~ → Flutter-Bordmittel, Navigator.
 5. **Kennzahlen-Definitionen** (Abschnitt R2) als kurzes Dokument, z. B. `docs/requirements/DASHBOARD_METRICS.md`.
 6. Wireframes auf Basis der geklärten Szenarien.

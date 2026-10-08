@@ -1,9 +1,9 @@
 # Datenbankmodell
 
-> Status: Entwurf zur Abstimmung im Team
+> Status: Umgesetzt in `lib/core/database/tables.dart` (Schema-Version 1)
 > Datum: 08.10.2026
 > Grundlage: Anforderungsdokument Kap. 7, `REQUIREMENTS_REVIEW.md`, `ADR-002-admin-scope-and-users.md`
-> Unabhängig von der Zugriffstechnologie (Drift oder sqflite). Das Schema gilt für beide.
+> Zugriff über Drift (ADR-003). Tabellennamen, Spalten und Constraints entsprechen exakt diesem Dokument.
 
 ---
 
@@ -15,12 +15,13 @@
 | Fremdschlüssel | `PRAGMA foreign_keys = ON` bei jeder Verbindung (in SQLite standardmäßig aus) |
 | Namen | Tabellen und Spalten Englisch, `snake_case`, Tabellen im Singular |
 | Primärschlüssel | `id INTEGER PRIMARY KEY` (automatisch fortlaufend) |
-| Zeitpunkte | `TEXT` im ISO-8601-Format in UTC, z. B. `2026-10-08T14:30:00Z` |
-| Datumswerte ohne Uhrzeit | `TEXT` im Format `YYYY-MM-DD` |
+| Zeitpunkte | `INTEGER`, Unix-Zeit in Sekunden (Drift-Standard). Vergleiche und `CHECK`s sind dadurch zuverlässig numerisch |
+| Datumswerte ohne Uhrzeit | wie Zeitpunkte, Uhrzeit wird auf 00:00 Ortszeit gesetzt (`event_date`) |
 | Geldbeträge | `INTEGER` in Cent. `1.234,50 Euro` wird als `123450` gespeichert. Keine Gleitkommazahlen für Geld |
-| Enums | `TEXT` mit `CHECK`-Constraint. Gespeichert wird der englische Name des Dart-Enums (`available`, nicht `Verfügbar`). Die Anzeige kommt aus `AppStrings` |
+| Enums | `TEXT` mit `CHECK`-Constraint (Drift `textEnum`). Gespeichert wird der englische Name des Dart-Enums (`available`, nicht `Verfügbar`). Die Anzeige kommt aus `AppStrings` |
 | Pflichtfelder | `NOT NULL`. Optional nur, wo ausdrücklich angegeben |
 | Zeitstempel | Jede fachliche Tabelle hat `created_at` und `updated_at` |
+| Wahrheitswerte | `INTEGER` 0/1 (Drift `boolean`) |
 | Archivieren | `archived_at` (NULL = aktiv). Gilt für `trailer` und `customer` |
 | Schema-Version | `PRAGMA user_version`. Startwert 1, jede Migration erhöht um 1 |
 
@@ -66,8 +67,8 @@ erDiagram
 | id | INTEGER | ja | PK |
 | name | TEXT | ja | UNIQUE |
 | is_active | INTEGER | ja | 0 oder 1, Standard 1 |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
 ### 3.2 `trailer_type`
 
@@ -75,8 +76,8 @@ erDiagram
 |---|---|---|---|
 | id | INTEGER | ja | PK |
 | name | TEXT | ja | UNIQUE, z. B. „Pkw-Anhänger“, „Tieflader“ |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
 Eigene Tabelle statt Freitext, damit „beliebteste Typen“ im Dashboard sauber gezählt werden. Typen werden in den Einstellungen gepflegt.
 
@@ -92,10 +93,10 @@ Eigene Tabelle statt Freitext, damit „beliebteste Typen“ im Dashboard sauber
 | location_address | TEXT | nein | Freitext-Adresse |
 | location_latitude | REAL | nein | −90 bis 90 |
 | location_longitude | REAL | nein | −180 bis 180 |
-| location_updated_at | TEXT | nein | |
-| archived_at | TEXT | nein | |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| location_updated_at | INTEGER | nein | |
+| archived_at | INTEGER | nein | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
 ### 3.4 `trailer_status_change`
 
@@ -105,7 +106,7 @@ Eigene Tabelle statt Freitext, damit „beliebteste Typen“ im Dashboard sauber
 | trailer_id | INTEGER | ja | FK → `trailer.id` |
 | old_status | TEXT | nein | NULL beim Anlegen des Anhängers |
 | new_status | TEXT | ja | wie `trailer.status` |
-| changed_at | TEXT | ja | |
+| changed_at | INTEGER | ja | |
 | changed_by_user_id | INTEGER | ja | FK → `app_user.id` |
 | rental_contract_id | INTEGER | nein | FK → `rental_contract.id`, gesetzt bei automatischer Änderung durch Übergabe/Rückgabe |
 
@@ -124,9 +125,9 @@ Nur Einfügen, nie Ändern oder Löschen. Jede Änderung an `trailer.status` sch
 | postal_code | TEXT | ja | TEXT wegen führender Nullen |
 | city | TEXT | ja | |
 | license_number | TEXT | nein | Führerscheinnummer |
-| archived_at | TEXT | nein | |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| archived_at | INTEGER | nein | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
 ### 3.6 `rental_contract`
 
@@ -135,19 +136,19 @@ Nur Einfügen, nie Ändern oder Löschen. Jede Änderung an `trailer.status` sch
 | id | INTEGER | ja | PK |
 | customer_id | INTEGER | ja | FK → `customer.id` |
 | trailer_id | INTEGER | ja | FK → `trailer.id` |
-| start_at | TEXT | ja | Mietbeginn |
-| end_at | TEXT | ja | `CHECK (end_at > start_at)` |
+| start_at | INTEGER | ja | Mietbeginn |
+| end_at | INTEGER | ja | `CHECK (end_at > start_at)` |
 | pickup_location | TEXT | ja | |
 | return_location | TEXT | ja | |
 | price_cents | INTEGER | ja | `CHECK (price_cents >= 0)` |
 | status | TEXT | ja | `planned`, `active`, `completed`, `cancelled` |
-| handed_over_at | TEXT | nein | tatsächliche Übergabe |
-| returned_at | TEXT | nein | tatsächliche Rückgabe |
+| handed_over_at | INTEGER | nein | tatsächliche Übergabe |
+| returned_at | INTEGER | nein | tatsächliche Rückgabe |
 | created_by_user_id | INTEGER | ja | FK → `app_user.id` |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
-Fachregeln aus ADR-002 §2.4, umgesetzt im Application Layer innerhalb einer Transaktion:
+Fachregeln aus ADR-002 §2.4, umgesetzt in `DriftContractRepository` innerhalb einer Transaktion:
 
 - Keine Überschneidung: Für denselben `trailer_id` darf es keinen anderen Vertrag mit Status `planned` oder `active` geben, für den `start_at < neues end_at` und `end_at > neues start_at` gilt.
 - Bearbeiten nur im Status `planned`.
@@ -161,7 +162,7 @@ Fachregeln aus ADR-002 §2.4, umgesetzt im Application Layer innerhalb einer Tra
 |---|---|---|---|
 | id | INTEGER | ja | PK |
 | trailer_id | INTEGER | ja | FK → `trailer.id` |
-| event_date | TEXT | ja | `YYYY-MM-DD` |
+| event_date | INTEGER | ja | Datum, Uhrzeit 00:00 |
 | description | TEXT | ja | |
 | damage_type | TEXT | ja | `accident`, `vandalism`, `wear`, `other` |
 | caused_by | TEXT | ja | `customer`, `internal`, `unknown` |
@@ -169,8 +170,8 @@ Fachregeln aus ADR-002 §2.4, umgesetzt im Application Layer innerhalb einer Tra
 | rental_contract_id | INTEGER | nein | FK → `rental_contract.id` |
 | cost_cents | INTEGER | nein | `CHECK (cost_cents IS NULL OR cost_cents >= 0)` |
 | created_by_user_id | INTEGER | ja | FK → `app_user.id` |
-| created_at | TEXT | ja | |
-| updated_at | TEXT | ja | |
+| created_at | INTEGER | ja | |
+| updated_at | INTEGER | ja | |
 
 ### 3.8 `photo`
 
@@ -181,7 +182,7 @@ Fachregeln aus ADR-002 §2.4, umgesetzt im Application Layer innerhalb einer Tra
 | damage_record_id | INTEGER | nein | FK → `damage_record.id`, `ON DELETE CASCADE` |
 | file_path | TEXT | ja | relativ zum App-Datenordner, UNIQUE |
 | sort_order | INTEGER | ja | Standard 0, Reihenfolge der Anzeige |
-| created_at | TEXT | ja | |
+| created_at | INTEGER | ja | |
 
 `CHECK ((trailer_id IS NULL) <> (damage_record_id IS NULL))`: Ein Foto gehört genau zu einem Anhänger oder genau zu einem Schaden.
 
@@ -238,7 +239,7 @@ UNIQUE-Spalten (`internal_code`, `license_plate`, `name`, `file_path`) sind auto
 
 ## 7. Startdaten
 
-Bei der ersten Erstellung der Datenbank:
+Bei der ersten Erstellung der Datenbank (`AppDatabase.migration.onCreate`):
 
 - ein Benutzer „Administrator“
 - Anhängertypen: Pkw-Anhänger, Kastenanhänger, Planenanhänger, Tieflader, Autotransporter
@@ -249,7 +250,5 @@ Bei der ersten Erstellung der Datenbank:
 
 | Punkt | Wo klären |
 |---|---|
-| Zugriffstechnologie Drift oder sqflite | ADR-003 |
 | Berechnung der Dashboard-Kennzahlen | `REQUIREMENTS_REVIEW.md` R2 |
 | Backup-Format und Import-Verhalten | `REQUIREMENTS_REVIEW.md` R3 |
-| Ermittlung des App-Datenordners (z. B. `path_provider`, neue Dependency) | zusammen mit ADR-003 |

@@ -1,8 +1,8 @@
 # Anhängerverwaltung – Project Status
 
-> Status: Initial Planning
+> Status: Foundation completed
 >
-> Last updated: October 2026
+> Last updated: 2026-10-08
 
 ---
 
@@ -381,38 +381,31 @@ AI should not independently introduce new architecture, UI patterns, dependencie
 
 ---
 
-## 13. Current Development Rule
+## 13. Foundation Results
 
-At this stage: **do not start feature implementation yet.**
+| Task | Result |
+|---|---|
+| Database Design | `docs/database/DATABASE_MODEL.md`, implemented with Drift (ADR-003) |
+| Scenario-Based Wireframes | **open** |
+| Design System | `docs/design-system/DESIGN_SYSTEM.md`, components in `lib/core/design/widgets/` |
+| Development & AI Guidelines | `AGENTS.md`, `CLAUDE.md`, `docs/architecture/ARCHITECTURE.md`, ADR-004 |
 
-First complete the four foundation tasks:
+Additional decisions: ADR-002 (admin manages customers and contracts, user selection without password, contract status "Geplant", archive instead of delete).
 
-1. Database Design
-2. Scenario-Based Wireframes
-3. Design System
-4. Development & AI Guidelines
+Implemented: database with 8 tables, repositories with business rules and tests, user selection on startup, navigation with placeholder pages, CI (analyze, test, Windows build).
 
-After these are reviewed and accepted, begin application implementation.
+## 14. Next Steps
 
----
-
-## 14. Current Priority
-
-The immediate project priority is:
-
-```text
-Database
-    ↓
-User Scenarios & Wireframes
-    ↓
-Design System
-    ↓
-Development & AI Guidelines
-    ↓
-Application Development
-```
-
----
+1. Review the foundation (this pull request) as a team.
+2. Create wireframes for the trailer list and trailer detail first, then the remaining screens.
+3. Decide dashboard metric definitions and backup format (`REQUIREMENTS_REVIEW.md` R2, R3).
+4. Start feature development, one GitHub issue per feature:
+   - `feature/trailer-management` (reference feature, implement first)
+   - `feature/damage-management`
+   - `feature/customers`
+   - `feature/contracts`
+   - `feature/settings` (users, trailer types, backup)
+   - `feature/dashboard`
 
 ## 15. Important Project Constraints
 
@@ -433,13 +426,4 @@ The following constraints are currently established:
 
 ## 16. Next Step
 
-Complete the four current GitHub tasks.
-
-After they are completed:
-
-1. Review the database model.
-2. Review the system scenarios and wireframes.
-3. Review and finalize the Design System.
-4. Finalize the Development & AI Guidelines.
-5. Establish the final project structure.
-6. Begin application implementation.
+See section 14.

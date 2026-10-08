@@ -5,66 +5,62 @@ Diese Datei ist kurz gehalten und verweist auf die verbindlichen Dokumente. Bei 
 
 ## Projekt in einem Satz
 
-Offline-Desktop-Verwaltungsoberfläche für eine Anhängervermietung (Schulprojekt). Flutter/Dart, `fluent_ui`, lokales SQLite, Zielplattform Windows, Entwicklung auf macOS. UI-Sprache Deutsch.
+Offline-Desktop-Verwaltungsoberfläche für eine Anhängervermietung (Schulprojekt). Flutter/Dart, `fluent_ui`, SQLite über Drift, Zielplattform Windows, Entwicklung auf macOS. UI-Sprache Deutsch.
 
 ## Vor jeder Aufgabe lesen
 
 | Aufgabe betrifft | Dokument |
 |---|---|
-| immer | `docs/project/PROJECT_CONTEXT_AND_GOVERNANCE.md` (insb. §12, §23, §24) |
-| aktueller Stand, Phase | `docs/project/PROJECT_STATUS.md` |
-| Ordner, Schichten, Imports | `docs/architecture/PROJECT_STRUCTURE.md` |
+| immer | `docs/architecture/ARCHITECTURE.md` |
+| Ordner, Dateinamen, Imports | `docs/architecture/PROJECT_STRUCTURE.md` |
 | jede UI | `docs/design-system/DESIGN_SYSTEM.md` |
+| Datenbank, Repositories | `docs/database/DATABASE_MODEL.md`, ADR-002, ADR-003 |
+| Controller, Navigation | ADR-004 |
 | fachliche Anforderungen | `docs/requirements/` (PDF und `REQUIREMENTS_REVIEW.md`) |
-| Technologie | `docs/decisions/ADR-*.md` |
-
-## Aktuelle Phase
-
-**Foundation-Phase.** Es wird noch keine Feature-Logik implementiert (`PROJECT_STATUS.md` §13).
-Erlaubt sind Dokumentation, Design-System-Komponenten unter `lib/core/design/` und Aufräumarbeiten am Gerüst.
-Wenn eine Aufgabe Feature-Code verlangt: kurz darauf hinweisen und nachfragen.
+| Teamprozess | `docs/project/PROJECT_CONTEXT_AND_GOVERNANCE.md` |
 
 ## Befehle
 
 ```bash
 flutter pub get
-flutter analyze            # muss ohne Fehler und Warnungen laufen
-dart format .
+dart run build_runner build --delete-conflicting-outputs   # nach Klonen und nach jeder Tabellenänderung
+dart format lib test
+flutter analyze            # muss ohne Meldungen laufen
 flutter test
-flutter run -d macos       # lokale Entwicklung
-flutter build windows      # nur auf Windows bzw. Windows-CI-Runner
+flutter run -d macos       # bzw. -d windows
 ```
+
+`*.g.dart` wird generiert und nicht eingecheckt. Fehlermeldungen wie „`_$AppDatabase` not found“ bedeuten: `build_runner` ausführen.
 
 ## Harte Regeln
 
-1. **Offline.** Keine Netzwerkaufrufe, keine Cloud-Dienste, keine externen Bild-URLs. Fotos und Datenbank liegen im lokalen App-Datenordner.
-2. **Schichten.** `presentation -> application -> repository -> source -> SQLite`. Widgets greifen nie direkt auf die Datenbank zu. Ein Feature importiert kein anderes Feature. `core/` importiert kein Feature.
-3. **Design System.** Keine rohen Farben, Abstände, Radien oder `TextStyle`s. Nur `AppColors`, `AppSpacing`, `AppRadius`, `AppText`, `AppIcons`. Keine `fluent_ui`-Basis-Widgets (`Button`, `TextBox`, `ContentDialog`) im Feature-Code, sondern die `App*`-Komponenten aus `lib/core/design/widgets/`.
-4. **Texte.** Alle UI-Texte stehen in `lib/core/constants/app_strings.dart`. Keine hartcodierten Strings in Widgets. Standardtexte aus `DESIGN_SYSTEM.md` §9 wörtlich übernehmen.
-5. **Code-Stil.** Bezeichner auf Englisch. Keine Kommentare und keine Emojis im Code (`DESIGN_SYSTEM.md` §0). Lint-Regeln aus `analysis_options.yaml` einhalten (u. a. single quotes, trailing commas, `const`, `final`-Locals).
-6. **Formate.** Datum `TT.MM.JJJJ`, Beträge `1.234,50 Euro`, beides über `lib/core/formatting/app_formats.dart`.
-7. **Kleine Änderungen.** Nur die Dateien ändern, die die Aufgabe betrifft. Keine Umbauten an fremden Features „nebenbei“.
+1. **Offline.** Keine Netzwerkaufrufe, keine Cloud-Dienste, keine externen Bild-URLs.
+2. **Schichten.** `presentation -> application -> Repository-Schnittstelle -> Drift-Implementierung -> SQLite`. Widgets und Controller kennen nur Schnittstellen aus `lib/data/repositories/`, nie `Drift*Repository`, `AppDatabase` oder `*Row`-Klassen. Ein Feature importiert kein anderes Feature.
+3. **Fachregeln** stehen in den Repository-Implementierungen und werden als `RepositoryException` gemeldet. Nicht in Widgets duplizieren. Neue Fachregel = neuer Test in `test/data/`.
+4. **State.** `ChangeNotifier`-Controller in `features/<x>/application/`, Repositories über den Konstruktor, in der Seite aus `AppScope.of(context)`. Kein Riverpod, provider, BLoC, go_router (ADR-004).
+5. **Design System.** Keine rohen Farben, Abstände, Radien oder `TextStyle`s. Nur `AppColors`, `AppSpacing`, `AppSizes`, `AppRadius`, `AppText`, `AppIcons`. Keine `fluent_ui`-Basis-Widgets (`Button`, `TextBox`, `ComboBox`, `ContentDialog`) im Feature-Code, sondern `App*`-Komponenten aus `lib/core/design/widgets/`.
+6. **Texte.** Alle UI-Texte in `lib/core/constants/app_strings.dart`, mit echten Umlauten. Keine hartcodierten Strings in Widgets.
+7. **Daten.** Geld als `int` in Cent, Anzeige mit `AppFormats.currencyFromCents`. Datum mit `AppFormats.date`. Aktionen mit Protokoll brauchen die `userId` aus `AppScope.of(context).currentUser`.
+8. **Code-Stil.** Bezeichner Englisch. Keine Kommentare, keine Emojis im Code. Explizite Typen wie im bestehenden Code. Lint-Regeln aus `analysis_options.yaml`.
+9. **Kleine Änderungen.** Nur Dateien ändern, die die Aufgabe betrifft.
 
 ## STOP: erst fragen, nicht selbst entscheiden
 
-Folgende Punkte sind laut Governance §23 **offen** und dürfen nicht von einer KI-Session festgelegt werden:
-
-- neue Dependency in `pubspec.yaml` (auch Drift, sqflite, Provider, Riverpod, go_router …)
-- Drift vs. `sqflite + sqflite_common_ffi`
-- State-Management-Lösung und Routing
-- Datenbankschema, Migrationen, Backup-Format
+- neue Dependency in `pubspec.yaml`
+- Änderungen an `tables.dart` (Schema), `schemaVersion`, Migrationen
 - Änderungen an Design-Tokens oder neue Komponentenarten
-- Branch-Strategie, CI/CD, Lizenz
+- Berechnung der Dashboard-Kennzahlen und Backup-Format (noch offen, `REQUIREMENTS_REVIEW.md` R2/R3)
+- Änderungen an ADRs, Branch-Strategie, CI
 
-Vorgehen: Vorschlag mit Begründung formulieren und, wenn das Team zustimmt, als ADR in `docs/decisions/ADR-NNN-<thema>.md` dokumentieren.
+Vorgehen: Vorschlag mit Begründung formulieren und nach Zustimmung als ADR in `docs/decisions/ADR-NNN-<thema>.md` dokumentieren.
 
 ## Git
 
-- Nie direkt auf `main` arbeiten. Branches: `docs/<thema>`, `feature/<thema>`, `fix/<kurzbeschreibung>`, `chore/<thema>`.
+- Branches: `feature/<thema>`, `fix/<kurzbeschreibung>`, `docs/<thema>`, `chore/<thema>`.
 - Commits im Conventional-Commit-Stil: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`, `build:`. Englisch, Imperativ, klein geschrieben.
 - Ein Thema pro Pull Request. PR-Vorlage `.github/PULL_REQUEST_TEMPLATE.md` vollständig ausfüllen.
 - Nicht pushen, keine PRs erstellen und nichts mergen ohne ausdrückliche Anweisung.
 
 ## Definition of Done
 
-`flutter analyze` sauber, `flutter test` grün, Design-System-Checkliste (`DESIGN_SYSTEM.md` §10) erfüllt, betroffene Doku und `CHANGELOG.md` aktualisiert.
+`flutter analyze` ohne Meldungen, `flutter test` grün, CI grün, Design-System-Checkliste (`DESIGN_SYSTEM.md` §10) erfüllt, betroffene Doku und `CHANGELOG.md` aktualisiert.

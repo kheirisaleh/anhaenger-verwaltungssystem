@@ -2,61 +2,57 @@
 
 > Verbindliche Ordnerstruktur der Flutter-Anwendung.
 > Neue Dateien werden in die passende bestehende Ebene eingeordnet, nicht daneben.
+> Schichten und Regeln: `ARCHITECTURE.md`.
 
 ## Ordner
 
 ```text
 lib/
-├── main.dart                     Einstiegspunkt
-├── core/                         Querschnitt, von allen Features nutzbar
-│   ├── constants/                AppStrings, feste Oberflaechentexte
-│   ├── database/                 lokaler SQLite-Zugang
-│   ├── design/                   Design System
-│   │   ├── app_colors.dart
-│   │   ├── app_typography.dart
-│   │   ├── app_spacing.dart
-│   │   ├── app_icons.dart
-│   │   ├── app_theme.dart
-│   │   └── widgets/              AppButton, AppCard, AppTextField, ...
-│   └── formatting/               Datums- und Betragsformate
+├── main.dart                         Einstiegspunkt
+├── core/                             Querschnitt, von allen Features nutzbar
+│   ├── constants/app_strings.dart    alle Oberflächentexte
+│   ├── database/                     Drift: Tabellen, Datenbank, App-Datenordner
+│   ├── design/                       Design System (Tokens)
+│   │   └── widgets/                  App*-Komponenten
+│   └── formatting/app_formats.dart   Datums- und Betragsformate
 ├── data/
-│   ├── models/                   Entitaeten und Enums
-│   ├── repositories/             Schnittstellen und Implementierungen
-│   └── sources/                  konkrete Datenquellen
-├── features/                     je Feature Presentation und Application
+│   ├── models/                       Modelle, Drafts, Enums
+│   ├── repositories/                 Schnittstellen + RepositoryException
+│   │   └── drift/                    Implementierungen mit Fachregeln
+│   └── sources/                      Dateiablage für Fotos
+├── features/
 │   ├── dashboard/
 │   ├── trailers/
 │   ├── damages/
 │   ├── customers/
 │   ├── contracts/
 │   └── settings/
-└── shared/                       app-weite Huelle und Navigation
+│       ├── application/              Controller
+│       └── presentation/             Seiten und feature-eigene Widgets
+└── shared/                           App-Start, AppScope, Benutzerauswahl, Navigation
+
+test/
+├── helpers/                          In-Memory-Datenbank, Testdaten
+├── core/
+├── data/                             Repository- und Datenbanktests
+└── widget_test.dart
 ```
 
-## Schichtregel
+## Abhängigkeitsregeln
 
-```text
-presentation  ->  application  ->  repository  ->  source  ->  SQLite
-```
+- `features/` darf `core/`, `data/` und `shared/app_dependencies.dart` nutzen.
+- `core/` importiert kein Feature und nichts aus `shared/`.
+- Ein Feature importiert kein anderes Feature. Gemeinsame Teile wandern nach `core/` oder `shared/`.
+- Nur `shared/app_dependencies.dart` und Tests importieren `data/repositories/drift/`.
+- Jede Oberfläche nutzt die Komponenten aus `core/design/widgets/`.
 
-Eine Schicht kennt nur die naechste darunter. Widgets greifen nie direkt auf die Datenbank zu.
+## Dateinamen
 
-## Abhaengigkeitsregeln
-
-- `features/` darf `core/` und `data/` nutzen.
-- `core/` darf kein Feature importieren.
-- Ein Feature importiert kein anderes Feature; gemeinsame Teile wandern nach `core/` oder `shared/`.
-- Jede Oberflaeche nutzt die Komponenten aus `core/design/widgets/`.
-
-## Projekt initialisieren
-
-Die plattformspezifischen Ordner und `pubspec.yaml` werden nicht von Hand angelegt. Im Wurzelverzeichnis ausfuehren:
-
-```bash
-flutter create --platforms=windows,macos --org de.anhaengerverwaltung .
-flutter pub add fluent_ui intl
-flutter pub add --dev flutter_lints
-flutter analyze
-```
-
-`flutter create` ergaenzt nur fehlende Dateien und ueberschreibt die vorhandene `lib/`-Struktur nicht. Danach `lib/main.dart` pruefen, falls der Befehl eine Vorlage angelegt hat.
+| Art | Muster | Beispiel |
+|---|---|---|
+| Seite | `<name>_page.dart` | `trailer_detail_page.dart` |
+| Controller | `<name>_controller.dart` | `trailer_list_controller.dart` |
+| Feature-Widget | `<name>.dart` in `presentation/widgets/` | `trailer_status_card.dart` |
+| Repository-Schnittstelle | `<name>_repository.dart` | `trailer_repository.dart` |
+| Drift-Implementierung | `drift_<name>_repository.dart` | `drift_trailer_repository.dart` |
+| Test | `<datei>_test.dart` | `trailer_repository_test.dart` |
